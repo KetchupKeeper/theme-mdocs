@@ -1,0 +1,20 @@
+<!-- Final fallback: used when neither an exact status nor a 4xx/5xx template matches.
+     Picks the wording from the status so it still reads well on its own. -->
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${error?.status ?: '错误'} - ${site.title}|">页面出错了</title>
+  </template>
+
+  <div class="mdocs-container-page">
+    <th:block
+      th:with="status = ${error?.status ?: 500},
+               isClientError = ${status >= 400 and status < 500},
+               title = ${isClientError} ? '请求无法完成' : '服务出了点问题',
+               detail = ${not #strings.isEmpty(error?.detail) ? error.detail : (isClientError ? '这个请求无法被处理，请检查链接后重试。' : '页面暂时无法加载，请稍后重试。')}"
+    >
+      <th:block
+        th:replace="~{error-page :: errorPage(${status}, ${title}, ${detail})}"
+      ></th:block>
+    </th:block>
+  </div>
+</include>

@@ -1,0 +1,15 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${tag.spec.displayName} - ${site.title}|">标签归档</title>
+  </template>
+
+  <div class="mdocs-container-page page-wrap">
+    <h1 class="page-title" th:text="${tag.spec.displayName}"></h1>
+
+    <ul class="post-list">
+      <include src="post-card.html"></include>
+    </ul>
+
+    <include src="pagination.html"></include>
+  </div>
+</include>

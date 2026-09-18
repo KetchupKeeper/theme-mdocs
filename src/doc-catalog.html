@@ -1,0 +1,140 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${project.spec.displayName} - ${site.title}|">文档项目</title>
+    <th:block th:if="${pluginFinder.available('plugin-docsme')}">
+      <link rel="stylesheet" th:href="@{/plugins/plugin-docsme/assets/static/dist/main.css?v={version}(version=${plugin.version})}" />
+      <script th:src="@{/plugins/plugin-docsme/assets/static/dist/main.iife.js?v={version}(version=${plugin.version})}"></script>
+      <th:block th:replace="~{plugin:plugin-docsme:modules/plugin-scripts}" />
+    </th:block>
+  </template>
+
+  <!-- Docsme: project catalog page -->
+  <div class="dm-container mdocs-docsme-page" th:if="${pluginFinder.available('plugin-docsme')}">
+    <div class="dm-layout">
+      <aside class="dm-sidebar" dm-data dm-bind:class="{'dm-sidebar--show' : $store.sidebar.open}">
+        <div class="dm-sidebar__content">
+          <div class="mdocs-docsme-sidebar-controls">
+            <button
+              class="mdocs-docsme-back"
+              type="button"
+              onclick="history.back()"
+              aria-label="返回上一页"
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>返回</span>
+            </button>
+
+            <div class="mdocs-docsme-version">
+              <span class="mdocs-docsme-version-label">版本</span>
+              <div
+                class="mdocs-docsme-version-switch"
+                th:if="${versions != null and #lists.size(versions) gt 1}"
+              >
+                <button
+                  class="mdocs-docsme-version-btn"
+                  type="button"
+                  data-mdocs-version-trigger
+                >
+                  <span th:text="${currentVersion.spec.slug}">default</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="mdocs-docsme-version-panel" data-mdocs-version-panel hidden>
+                  <a
+                    th:each="version : ${versions}"
+                    th:if="${docTree?.status?.permalink != null and currentVersion?.status?.permalink != null}"
+                    th:href="@{${#strings.replace(docTree.status.permalink, currentVersion.status.permalink, version.status.permalink)}}"
+                    th:text="${version.spec.slug}"
+                  >default</a>
+                </div>
+              </div>
+              <span
+                class="mdocs-docsme-version-current"
+                th:unless="${versions != null and #lists.size(versions) gt 1}"
+                th:text="${currentVersion.spec.slug}"
+              >default</span>
+            </div>
+          </div>
+
+          <div class="minidocs-kb-heading mdocs-docsme-heading" th:if="${project != null}">
+            <span class="minidocs-kb-cover">
+              <img
+                th:if="${not #strings.isEmpty(project.spec.icon)}"
+                th:src="${project.spec.icon}"
+                alt=""
+              />
+              <span
+                class="minidocs-kb-cover-fallback"
+                th:unless="${not #strings.isEmpty(project.spec.icon)}"
+                th:text="${not #strings.isEmpty(project.spec.displayName) ? #strings.substring(project.spec.displayName, 0, 1) : '档'}"
+              >档</span>
+            </span>
+            <div class="minidocs-kb-info">
+              <a
+                class="doc-sidebar-kb-title"
+                th:href="${project.status.permalink}"
+                th:text="${project.spec.displayName}"
+              ></a>
+              <div class="minidocs-kb-stats">
+                <span
+                  th:if="${theme.config.docsme?.nav_show_count != false}"
+                  th:text="|共 ${project.status.totalDocs} 篇文档|"
+                >共 0 篇文档</span>
+              </div>
+            </div>
+          </div>
+
+          <ul class="dm-nav-tree">
+            <li th:replace="~{plugin:plugin-docsme:modules/doc-tree :: single(docTrees=${docTrees})}" />
+          </ul>
+        </div>
+      </aside>
+      <div
+        class="dm-sidebar-backdrop"
+        dm-show="$store.sidebar.open"
+        dm-on:click="$store.sidebar.open = false"
+      ></div>
+
+      <main class="dm-main">
+        <div class="dm-content">
+          <th:block th:replace="~{plugin:plugin-docsme:modules/content-header}" />
+
+          <article class="dm-content__body">
+            <div class="dm-directory-grid">
+              <a
+                th:each="node : ${sonNodes}"
+                th:href="${node.status.permalink}"
+                class="dm-directory-card"
+              >
+                <div
+                  class="dm-directory-card__icon"
+                  th:text="${node.spec.type == 'TREE' ? '📁' : '📝'}"
+                ></div>
+                <div class="dm-directory-card__content">
+                  <h3 class="dm-directory-card__title" th:text="${node.spec.title}"></h3>
+                  <p
+                    th:if="${!#strings.isEmpty(node.spec.description)}"
+                    class="dm-directory-card__description"
+                    th:text="${node.spec.description}"
+                  ></p>
+                </div>
+              </a>
+            </div>
+          </article>
+
+          <th:block th:replace="~{plugin:plugin-docsme:modules/navigation}" />
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <section class="section" th:unless="${pluginFinder.available('plugin-docsme')}">
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">Docsme 插件不可用，无法渲染此页面。</p>
+    </div>
+  </section>
+</include>

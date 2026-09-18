@@ -1,0 +1,50 @@
+<th:block
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="menu"
+  th:with="primaryMenu = ${menuFinder.getPrimary()}"
+>
+  <nav
+    class="header-menu"
+    th:if="${not (primaryMenu == null) and not #lists.isEmpty(primaryMenu.menuItems)}"
+  >
+    <div
+      class="header-menu-item"
+      th:each="item : ${primaryMenu.menuItems}"
+      th:classappend="${not #lists.isEmpty(item.children)} ? ' has-dropdown'"
+    >
+      <a
+        th:if="${#lists.isEmpty(item.children)}"
+        th:href="@{${item.status.href}}"
+        th:text="${item.status.displayName}"
+        class="header-menu-link"
+        th:target="${item.spec.target?.value}"
+        th:rel="${item.spec.target?.value == '_blank'} ? 'noopener' : null"
+      ><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg></a>
+
+      <button
+        th:unless="${#lists.isEmpty(item.children)}"
+        class="header-menu-trigger"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <span th:text="${item.status.displayName}"></span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div
+        th:unless="${#lists.isEmpty(item.children)}"
+        class="header-menu-dropdown"
+      >
+        <a
+          th:each="child : ${item.children}"
+          th:href="@{${child.status.href}}"
+          th:text="${child.status.displayName}"
+          th:target="${child.spec.target?.value}"
+          th:rel="${child.spec.target?.value == '_blank'} ? 'noopener' : null"
+        ></a>
+      </div>
+    </div>
+  </nav>
+</th:block>

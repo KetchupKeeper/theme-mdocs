@@ -1,0 +1,1202 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-mdocs-setting
+spec:
+  forms:
+    # ============ Global settings ============
+    - group: global
+      label: 全局设置
+      formSchema:
+        - $formkit: attachment
+          key: site_logo
+          name: site_logo
+          label: 昼间（浅色）网站 Logo
+          help: 浅色主题下页眉与页脚 Logo；留空时自动使用 Halo 系统设置中的站点 Logo
+          value: "/themes/theme-mdocs/assets/img/day.svg"
+        - $formkit: attachment
+          key: site_logo_dark
+          name: site_logo_dark
+          label: 夜间（深色）网站 Logo
+          help: 深色主题下自动替换为深色 Logo；留空时继续使用昼间 Logo
+          value: "/themes/theme-mdocs/assets/img/night.svg"
+        - $formkit: switch
+          key: show_site_name
+          name: show_site_name
+          label: 是否显示网站名称
+          help: 关闭后页眉只显示 Logo，不显示站点名称
+          value: true
+        - $formkit: color
+          key: primary_color
+          name: primary_color
+          label: 默认主题色
+          format: hex
+          help: 留空或填写黑白灰色时自动按明暗主题使用黑色/白色；填写其他颜色时全局使用该颜色
+          value: "#1f2329"
+        - $formkit: text
+          key: font_size
+          name: font_size
+          label: 全局字体大小
+          help: 例如 14px、15px、16px
+          value: "16px"
+        - $formkit: text
+          key: border_radius
+          name: border_radius
+          label: 全局圆角
+          help: 例如 8px、12px、16px
+          value: "12px"
+        - $formkit: attachment
+          key: background_image
+          name: background_image
+          label: 页面背景图
+          help: 选填；为空时使用下方背景色
+          value: ""
+        - $formkit: color
+          key: bg_color_light
+          name: bg_color_light
+          label: 浅色主题背景色
+          value: "#ffffff"
+        - $formkit: color
+          key: bg_color_dark
+          name: bg_color_dark
+          label: 深色主题背景色
+          value: "#0d1117"
+
+    # ============ Header navigation ============
+    - group: nav
+      label: 页眉导航
+      formSchema:
+        - $formkit: array
+          key: doc_nav_buttons
+          name: doc_nav_buttons
+          label: 左侧导航按钮组
+          help: 页眉左侧的导航按钮组，最多 3 个，可拖拽排序
+          sortable: true
+          max: 3
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: text
+              key: title
+              name: title
+              label: 导航标题
+              value: ""
+            - $formkit: url
+              key: url
+              name: url
+              label: 导航链接
+              value: ""
+
+        - $formkit: array
+          key: user_buttons
+          name: user_buttons
+          label: User 按钮组（图标按钮）
+          help: 页眉右侧自定义图标按钮组，显示在主题切换按钮的左侧、登录按钮之前；可拖拽排序
+          sortable: true
+          max: 6
+          addLabel: 添加图标按钮
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.label
+          children:
+            - $formkit: text
+              key: label
+              name: label
+              label: 按钮名称
+              help: 用于无障碍阅读与后台识别，页面中显示为图标
+              value: ""
+            - $formkit: textarea
+              key: svg
+              name: svg
+              label: 按钮 SVG 代码
+              help: 直接粘贴完整 <svg>...</svg>；图标尺寸与颜色由主题统一控制，不会受粘贴代码影响
+              value: ""
+            - $formkit: color
+              key: color
+              name: color
+              label: 图标颜色
+              help: 留空则跟随主题默认的图标颜色
+              value: ""
+            - $formkit: url
+              key: url
+              name: url
+              label: 按钮链接
+              value: ""
+
+    # ============ Homepage modules (drag to reorder) ============
+    - group: homepage
+      label: 首页设置
+      formSchema:
+        - $formkit: array
+          key: modules
+          name: modules
+          label: 首页模块
+          help: 拖拽调整模块顺序，每个模块设置类型后填写对应字段
+          sortable: true
+          addLabel: 添加模块
+          value:
+            - type: hero-carousel
+              title: 首页主视觉
+              hc_title: "源蝶文档"
+              hc_subtitle: "面向技术文档、知识库与产品手册的 Halo 主题，支持分类树导航、多级文档与明暗主题。"
+              hc_primary_text: 快速开始
+              hc_primary_url: ""
+              hc_primary_color: ""
+              hc_secondary_text: 浏览文档
+              hc_secondary_url: ""
+              hc_secondary_color: ""
+              hc_install_options:
+                - label: Docker
+                  icon: ""
+                  url: ""
+                - label: 1Panel
+                  icon: ""
+                  url: ""
+                - label: 宝塔面板
+                  icon: ""
+                  url: ""
+                - label: 更多方式
+                  icon: ""
+                  url: ""
+              hc_carousel_enabled: true
+              hc_carousel_speed: 5000
+              hc_carousel_show_dots: true
+              hc_default_image: "/themes/theme-mdocs/assets/img/demo-docs.jpg"
+              hc_carousel_images:
+                - src: "/themes/theme-mdocs/assets/img/demo-docsme.jpg"
+                  alt: 轮播封面
+                  href: ""
+            - type: quick-start
+              title: 快速开始
+              qs_more_text: 查看更多
+              qs_more_url: ""
+              qs_cards:
+                - title: 初始化站点
+                  subtitle: 安装之后
+                  description: "完成首次访问、创建管理员账号和基础设置。"
+                  url: ""
+                  image: "/themes/theme-mdocs/assets/img/demo-docsme.jpg"
+                  overlay_enabled: true
+                  overlay_color: "#1f2329"
+                - title: 发布第一篇文章
+                  subtitle: 熟悉内容编辑
+                  description: "熟悉内容编辑和发布流程。"
+                  url: ""
+                  image: ""
+                  overlay_enabled: false
+                  overlay_color: ""
+                - title: 探索应用市场
+                  subtitle: 主题与插件
+                  description: "发现丰富的主题、插件以扩展站点能力。"
+                  url: ""
+                  image: ""
+                  overlay_enabled: false
+                  overlay_color: ""
+            - type: cards
+              title: 卡片模块 · 简洁样式
+              cards_layout: type3
+              more_enabled: true
+              more_text: 查看更多
+              more_url: ""
+              cards_items:
+                - cover: ""
+                  icon: |-
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  title: 可编辑文档
+                  description: 后台可直接录入分类、文章与插件文档，前台以统一卡片展示。
+                  url: ""
+                  show_description: true
+                - cover: ""
+                  icon: |-
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                  title: 明暗主题
+                  description: 自动跟随系统并提供昼/夜 Logo 与背景色设置。
+                  url: ""
+                  show_description: true
+                - cover: ""
+                  icon: |-
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  title: 多模块组合
+                  description: 首页模块可重复添加并自由排序，用于搭建不同类型的首页。
+                  url: ""
+                  show_description: true
+            - type: ocean-categories
+              title: 模块四 · 文章分类
+              more_enabled: true
+              more_text: 查看更多
+              more_url: ""
+              ocean_blocks:
+                - category: ""
+                  title: 分类卡片一
+                  color: "#1f2329"
+                  code: ""
+                - category: ""
+                  title: 分类卡片二
+                  color: "#1f2329"
+                  code: ""
+                - category: ""
+                  title: 分类卡片三
+                  color: "#1f2329"
+                  code: ""
+                - category: ""
+                  title: 文档组卡片
+                  color: "#1f2329"
+                  code: ""
+            - type: ocean-menu
+              title: 模块五 · 菜单
+              more_enabled: true
+              more_text: 查看更多
+              more_url: ""
+              ocean_menus:
+                - menu: primary
+            - type: ocean-posts
+              title: 模块六 · 推荐文章
+              ocean_posts_source: categories
+              ocean_posts_icon: |-
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+              ocean_posts_category: ""
+            - type: plugin-docsme-module
+              title: 模块七 · Docsme 文档项目
+              doc_content_source: archive
+              doc_more_enabled: true
+              doc_more_text: 查看更多
+              doc_more_url: ""
+              doc_layout: cover
+              doc_cover_items: []
+              doc_tree_items: []
+            - type: plugin-minidocs-module
+              title: 模块八 · MiniDocs 知识库
+              doc_content_source: archive
+              doc_more_enabled: true
+              doc_more_text: 查看更多
+              doc_more_url: ""
+              doc_layout: cover
+              doc_cover_items: []
+              doc_tree_items: []
+          itemLabels:
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: select
+              key: type
+              name: type
+              label: 模块类型
+              value: hero-carousel
+              options:
+                - label: 模块一（轮播图模块）
+                  value: hero-carousel
+                - label: 模块二（快速开始模块）
+                  value: quick-start
+                - label: 模块三（卡片模块）
+                  value: cards
+                - label: 模块四（文章分类模块）
+                  value: ocean-categories
+                - label: 模块五（菜单模块）
+                  value: ocean-menu
+                - label: 模块六（推荐文章模块）
+                  value: ocean-posts
+                - label: 模块七（Docsme 插件适配模块）
+                  value: plugin-docsme-module
+                - label: 模块八（MiniDocs 插件适配模块）
+                  value: plugin-minidocs-module
+            - $formkit: text
+              key: title
+              name: title
+              label: 模块标题
+              value: ""
+            - $formkit: switch
+              if: "$value.type === 'cards' || $value.type === 'ocean-categories' || $value.type === 'ocean-menu'"
+              key: more_enabled
+              name: more_enabled
+              label: 标题右侧显示“查看更多”按钮
+              value: true
+            - $formkit: text
+              if: "($value.type === 'cards' || $value.type === 'ocean-categories' || $value.type === 'ocean-menu') && $value.more_enabled != false"
+              key: more_text
+              name: more_text
+              label: “查看更多”按钮文字
+              value: 查看更多
+            - $formkit: url
+              if: "($value.type === 'cards' || $value.type === 'ocean-categories' || $value.type === 'ocean-menu') && $value.more_enabled != false"
+              key: more_url
+              name: more_url
+              label: “查看更多”按钮链接
+              help: 例如 /archives、/categories；留空则不显示按钮
+              value: ""
+            - $formkit: switch
+              if: "$value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module'"
+              key: doc_more_enabled
+              name: doc_more_enabled
+              label: 标题右侧显示“查看更多”按钮
+              value: true
+            - $formkit: text
+              if: "($value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module') && $value.doc_more_enabled != false"
+              key: doc_more_text
+              name: doc_more_text
+              label: “查看更多”按钮文字
+              value: 查看更多
+            - $formkit: url
+              if: "($value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module') && $value.doc_more_enabled != false"
+              key: doc_more_url
+              name: doc_more_url
+              label: “查看更多”按钮链接
+              help: 通常指向该插件在站点中的归档页，例如 /docsme 或 /minidocs
+              value: ""
+            - $formkit: select
+              if: "$value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module'"
+              key: doc_content_source
+              name: doc_content_source
+              label: 卡片内容来源
+              help: 自动模式读取插件归档页的文档项目/知识库卡片，最多 8 个；手动模式沿用下方子模块一/二设置
+              value: archive
+              options:
+                - label: 插件归档页面卡片（自动读取）
+                  value: archive
+                - label: 手动添加文档卡片
+                  value: manual
+            - $formkit: text
+              if: "$value.type === 'hero-carousel'"
+              key: hc_title
+              name: hc_title
+              label: "Hero 主标题（仅 hero-carousel）"
+              value: ""
+            - $formkit: textarea
+              if: "$value.type === 'hero-carousel'"
+              key: hc_subtitle
+              name: hc_subtitle
+              label: "Hero 副标题"
+              value: ""
+            - $formkit: text
+              if: "$value.type === 'hero-carousel'"
+              key: hc_primary_text
+              name: hc_primary_text
+              label: 主按钮文字
+              value: 快速开始
+            - $formkit: text
+              if: "$value.type === 'hero-carousel'"
+              key: hc_primary_url
+              name: hc_primary_url
+              label: 主按钮链接
+              value: ""
+            - $formkit: color
+              if: "$value.type === 'hero-carousel'"
+              key: hc_primary_color
+              name: hc_primary_color
+              label: 主按钮颜色（留空用主题色）
+              value: ""
+            - $formkit: text
+              if: "$value.type === 'hero-carousel'"
+              key: hc_secondary_text
+              name: hc_secondary_text
+              label: 次按钮文字
+              value: 浏览文档
+            - $formkit: text
+              if: "$value.type === 'hero-carousel'"
+              key: hc_secondary_url
+              name: hc_secondary_url
+              label: 次按钮链接
+              value: ""
+            - $formkit: color
+              if: "$value.type === 'hero-carousel'"
+              key: hc_secondary_color
+              name: hc_secondary_color
+              label: 次按钮颜色（留空用默认描边）
+              value: ""
+            - $formkit: array
+              if: "$value.type === 'hero-carousel'"
+              key: hc_install_options
+              name: hc_install_options
+              label: 安装方式标签
+              help: 最多 4 个，页面中始终单行显示、不会换行
+              max: 4
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.label
+              children:
+                - $formkit: text
+                  key: label
+                  name: label
+                  label: 名称
+                  value: ""
+                - $formkit: textarea
+                  key: icon
+                  name: icon
+                  label: 图标 SVG 代码
+                  help: 可粘贴完整 <svg>...</svg>；主题会统一控制图标尺寸，颜色保持原样
+                  value: ""
+                - $formkit: text
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""
+            - $formkit: switch
+              if: "$value.type === 'hero-carousel'"
+              key: hc_carousel_enabled
+              name: hc_carousel_enabled
+              label: 启用轮播图
+              value: false
+            - $formkit: number
+              if: "$value.type === 'hero-carousel'"
+              key: hc_carousel_speed
+              name: hc_carousel_speed
+              label: 轮播速度(毫秒)
+              value: 5000
+            - $formkit: switch
+              if: "$value.type === 'hero-carousel'"
+              key: hc_carousel_show_dots
+              name: hc_carousel_show_dots
+              label: 显示导航点
+              value: true
+            - $formkit: attachment
+              if: "$value.type === 'hero-carousel'"
+              key: hc_default_image
+              name: hc_default_image
+              label: 默认图片
+              help: 未开启轮播图时显示的图片；开启轮播图后作为第一张轮播图
+              value: ""
+            - $formkit: array
+              if: "$value.type === 'hero-carousel'"
+              key: hc_carousel_images
+              name: hc_carousel_images
+              label: 轮播图图片组
+              value: []
+              itemLabels:
+                - type: attachment
+                  label: $value.src
+              children:
+                - $formkit: attachment
+                  key: src
+                  name: src
+                  label: 图片
+                  value: ""
+                - $formkit: text
+                  key: alt
+                  name: alt
+                  label: 描述
+                  value: ""
+                - $formkit: text
+                  key: href
+                  name: href
+                  label: 跳转链接
+                  value: ""
+            - $formkit: text
+              if: "$value.type === 'quick-start'"
+              key: qs_more_text
+              name: qs_more_text
+              label: 标题右侧按钮文字
+              value: 查看使用指南
+            - $formkit: text
+              if: "$value.type === 'quick-start'"
+              key: qs_more_url
+              name: qs_more_url
+              label: 标题右侧按钮链接
+              value: ""
+            - $formkit: array
+              if: "$value.type === 'quick-start'"
+              key: qs_cards
+              name: qs_cards
+              label: 快速开始卡片
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.title
+              children:
+                - $formkit: text
+                  key: title
+                  name: title
+                  label: 标题
+                  value: ""
+                - $formkit: text
+                  key: subtitle
+                  name: subtitle
+                  label: 副标题
+                  value: ""
+                - $formkit: textarea
+                  key: description
+                  name: description
+                  label: 描述
+                  value: ""
+                - $formkit: text
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""
+                - $formkit: attachment
+                  key: image
+                  name: image
+                  label: 卡片背景图片
+                  help: 第一项为主推大卡，建议使用横图；也可为右侧卡片设置背景图
+                  value: ""
+                - $formkit: switch
+                  key: overlay_enabled
+                  name: overlay_enabled
+                  label: 开启色彩遮罩
+                  help: 开启后在背景图片底部叠加主题色渐变遮罩
+                  value: false
+                - $formkit: color
+                  if: "$value.overlay_enabled === true"
+                  key: overlay_color
+                  name: overlay_color
+                  label: 遮罩颜色
+                  help: 留空使用默认主题色；渐变方向为从下往上
+                  value: ""
+            - $formkit: select
+              if: "$value.type === 'cards'"
+              key: cards_layout
+              name: cards_layout
+              label: "卡片布局（仅 cards）"
+              value: type1
+              options:
+                - label: 样式1(背景+标题+描述)
+                  value: type1
+                - label: 简洁（图标+标题+描述）
+                  value: type3
+            - $formkit: array
+              if: "$value.type === 'cards'"
+              key: cards_items
+              name: cards_items
+              label: 卡片项
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.title
+              children:
+                - $formkit: attachment
+                  key: cover
+                  name: cover
+                  label: 封面图
+                  value: ""
+                - $formkit: textarea
+                  key: icon
+                  name: icon
+                  label: 标题左侧图标 SVG
+                  help: 可粘贴完整 <svg>...</svg>；主题统一控制图标大小，颜色保留原样
+                  value: ""
+                - $formkit: text
+                  key: title
+                  name: title
+                  label: 标题
+                  value: ""
+                - $formkit: textarea
+                  key: description
+                  name: description
+                  label: 描述
+                  value: ""
+                - $formkit: text
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""
+                - $formkit: switch
+                  key: show_description
+                  name: show_description
+                  label: 显示描述
+                  value: true
+            - $formkit: select
+              if: "($value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module') && ($value.doc_content_source == null || $value.doc_content_source === '' || $value.doc_content_source === 'manual')"
+              key: doc_layout
+              name: doc_layout
+              label: 子模块布局
+              value: cover
+              options:
+                - label: 子模块一（背景图 + 标题 + 描述卡片）
+                  value: cover
+                - label: 子模块二（图标 + 标题 + 目录项卡片）
+                  value: tree
+            - $formkit: array
+              if: "($value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module') && ($value.doc_content_source == null || $value.doc_content_source === '' || $value.doc_content_source === 'manual') && ($value.doc_layout === 'cover' || $value.doc_layout === null || $value.doc_layout === '')"
+              key: doc_cover_items
+              name: doc_cover_items
+              label: 子模块一 · 文档卡片
+              help: 添加要展示的 Docsme / MiniDocs 文档；页面中每行最多四个、最多 8 个。文档链接可复制插件文档页地址填写，背景图与描述可自行补充或覆盖
+              sortable: true
+              max: 8
+              addLabel: 添加文档
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.title
+              children:
+                - $formkit: attachment
+                  key: cover
+                  name: cover
+                  label: 文档背景图
+                  help: 可选；为空时卡片显示纯色占位。可上传图片，也可直接粘贴插件文档的封面地址
+                  value: ""
+                - $formkit: text
+                  key: title
+                  name: title
+                  label: 文档标题
+                  value: ""
+                - $formkit: textarea
+                  key: description
+                  name: description
+                  label: 文档描述
+                  help: 单篇文档描述，按内容块样式最多显示三行
+                  value: ""
+                - $formkit: text
+                  key: url
+                  name: url
+                  label: 文档链接
+                  help: "Docsme 示例：/docs/project-slug 或 /docs/project-slug/version/doc-slug；MiniDocs 示例：/docs/view/kb-slug?docSlug=doc-slug"
+                  value: ""
+            - $formkit: array
+              if: "($value.type === 'plugin-docsme-module' || $value.type === 'plugin-minidocs-module') && ($value.doc_content_source == null || $value.doc_content_source === '' || $value.doc_content_source === 'manual') && $value.doc_layout === 'tree'"
+              key: doc_tree_items
+              name: doc_tree_items
+              label: 子模块二 · 目录卡片
+              help: 添加要展示的 Docsme / MiniDocs 文档；页面中每行最多四个、最多 8 个，每张卡片下方最多三个目录项
+              sortable: true
+              max: 8
+              addLabel: 添加文档
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.title
+              children:
+                - $formkit: textarea
+                  key: icon
+                  name: icon
+                  label: 图标 SVG 代码
+                  help: 显示在卡片标题左侧；可粘贴完整 <svg>...</svg>，主题统一控制大小、不限制颜色
+                  value: ""
+                - $formkit: text
+                  key: title
+                  name: title
+                  label: 文档标题
+                  value: ""
+                - $formkit: text
+                  key: url
+                  name: url
+                  label: 文档链接
+                  help: "Docsme 示例：/docs/project-slug 或 /docs/project-slug/version/doc-slug；MiniDocs 示例：/docs/view/kb-slug?docSlug=doc-slug"
+                  value: ""
+                - $formkit: array
+                  key: doc_children
+                  name: doc_children
+                  label: 左侧树状目录项
+                  help: 最多三个；显示在卡片下方，对应文档左侧树状导航中的目录内容
+                  max: 3
+                  value: []
+                  itemLabels:
+                    - type: text
+                      label: $value.title
+                  children:
+                    - $formkit: text
+                      key: title
+                      name: title
+                      label: 目录标题
+                      value: ""
+                    - $formkit: text
+                      key: url
+                      name: url
+                      label: 目录链接
+                      help: 指向该目录或文档的页面地址
+                      value: ""
+            - $formkit: array
+              if: "$value.type === 'ocean-categories'"
+              key: ocean_blocks
+              name: ocean_blocks
+              label: 内容块
+              help: 每个容器可单独选择分类并设置主色，最多四个
+              max: 4
+              min: 0
+              addLabel: 添加内容块
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.title
+              children:
+                - $formkit: categorySelect
+                  key: category
+                  name: category
+                  label: 分类
+                  allowCreate: false
+                  value: ""
+                - $formkit: text
+                  key: title
+                  name: title
+                  label: 标题
+                  help: 留空时显示分类名称
+                  value: ""
+                - $formkit: color
+                  key: color
+                  name: color
+                  label: 内容块主色
+                  help: 用于容器顶部线条和内容块内分类文字颜色
+                  value: "#0c7be0"
+                - $formkit: textarea
+                  key: code
+                  name: code
+                  label: 容器底部自定义代码
+                  help: 可粘贴 HTML、内联样式或脚本片段，将原样显示在该容器底部
+                  value: ""
+            - $formkit: array
+              if: "$value.type === 'ocean-menu'"
+              key: ocean_menus
+              name: ocean_menus
+              label: 菜单组
+              help: 最多添加四个菜单，每个菜单显示前四个一级菜单项
+              max: 4
+              min: 0
+              addLabel: 添加菜单
+              value: []
+              itemLabels:
+                - type: text
+                  label: $value.menu
+              children:
+                - $formkit: menuSelect
+                  key: menu
+                  name: menu
+                  label: 选择菜单
+                  value: ""
+            - $formkit: select
+              if: "$value.type === 'ocean-posts'"
+              key: ocean_posts_source
+              name: ocean_posts_source
+              label: 推荐文章数据来源
+              value: tag
+              options:
+                - label: 文章标签
+                  value: tag
+                - label: 文章分类
+                  value: categories
+            - $formkit: textarea
+              if: "$value.type === 'ocean-posts'"
+              key: ocean_posts_icon
+              name: ocean_posts_icon
+              label: 文章标题左侧图标 SVG
+              help: 显示在每篇推荐文章标题左侧；主题统一控制图标大小，颜色保留原样
+              value: ""
+            - $formkit: tagSelect
+              if: "$value.type === 'ocean-posts' && $value.ocean_posts_source === 'tag'"
+              key: ocean_posts_tag
+              name: ocean_posts_tag
+              label: 选择标签
+              help: 显示所选标签的前六篇文章；此模块使用上方“模块标题”作为标题
+              value: ""
+            - $formkit: categorySelect
+              if: "$value.type === 'ocean-posts' && $value.ocean_posts_source === 'categories'"
+              key: ocean_posts_category
+              name: ocean_posts_category
+              label: 选择分类
+              help: 显示所选分类的前六篇文章；此模块使用上方“模块标题”作为标题
+              allowCreate: false
+              value: ""
+
+    # ============ Footer settings ============
+    - group: footer
+      label: 页脚设置
+      formSchema:
+        - $formkit: textarea
+          key: copyright
+          name: copyright
+          label: 版权信息
+          value: "© 2026 源蝶Source开发"
+
+        - $formkit: switch
+          key: footer_separate_logo
+          name: footer_separate_logo
+          label: 单独设置页脚 Logo
+          help: 开启后可使用页脚专属的昼/夜 Logo；关闭时页脚直接使用全局设置中的昼/夜 Logo
+          value: false
+        - $formkit: attachment
+          if: "$value.footer_separate_logo === true"
+          key: footer_logo
+          name: footer_logo
+          label: 页脚 Logo
+          help: 昼间（浅色）主题下显示；开启单独设置后留空会回退到全局昼间 Logo
+          value: ""
+        - $formkit: attachment
+          if: "$value.footer_separate_logo === true"
+          key: footer_logo_dark
+          name: footer_logo_dark
+          label: 页脚深色 Logo（夜间主题）
+          help: 夜间主题下自动替换；留空时使用上方页脚 Logo（或全局夜间 Logo）
+          value: ""
+        - $formkit: switch
+          key: show_footer_name
+          name: show_footer_name
+          label: 显示网站名称
+          help: 在页脚备案栏左侧 Logo 旁显示网站名称
+          value: true
+
+        - $formkit: menuSelect
+          key: footer_menus
+          name: footer_menus
+          label: 页脚菜单
+          help: 选择要展示的 Halo 菜单，最多 4 个；可拖拽调整顺序，页面中按从左到右均分排列
+          multiple: true
+          sortable: true
+          maxCount: 4
+          value:
+            - primary
+
+        - $formkit: text
+          key: icp
+          name: icp
+          label: ICP 备案号
+          help: 选填，留空则不显示
+          value: ""
+        - $formkit: text
+          key: icp_link
+          name: icp_link
+          label: ICP 备案链接
+          help: 选填，留空默认跳转工信部备案查询
+          value: ""
+        - $formkit: text
+          key: gongan
+          name: gongan
+          label: 公安联网备案号
+          help: 选填，留空则不显示
+          value: ""
+        - $formkit: text
+          key: gongan_link
+          name: gongan_link
+          label: 公安联网备案链接
+          help: 选填，留空默认跳转全国互联网安全管理服务平台
+          value: ""
+
+    # ============ Theme documentation settings ============
+    - group: docs
+      label: 主题文档设置
+      formSchema:
+        - $formkit: categorySelect
+          key: doc_groups
+          name: doc_groups
+          label: 文档组归档分类
+          help: 手动添加要作为文档组的分类；归档页只展示这里添加的分类
+          multiple: true
+          allowCreate: false
+          value: []
+        - $formkit: text
+          key: archive_title
+          name: archive_title
+          label: 文档归档页标题
+          value: "文档"
+        - $formkit: textarea
+          key: archive_description
+          name: archive_description
+          label: 文档归档页描述
+          value: "按分类整理的文档组"
+        - $formkit: switch
+          key: sidebar_collapsible
+          name: sidebar_collapsible
+          label: 左侧分类可折叠
+          value: true
+        - $formkit: switch
+          key: sidebar_default_expanded
+          name: sidebar_default_expanded
+          label: 左侧导航默认全部展开
+          help: 关闭时仅展开当前文档所在路径
+          value: false
+        - $formkit: switch
+          key: sidebar_show_count
+          name: sidebar_show_count
+          label: 左侧导航显示文档数量
+          help: 显示文档组标题下的“共 X 篇文章”统计行
+          value: true
+        - $formkit: switch
+          key: show_copy_markdown
+          name: show_copy_markdown
+          label: 内容页顶部显示复制 Markdown 工具栏
+          value: true
+        - $formkit: array
+          key: toolbar_groups
+          name: toolbar_groups
+          label: 操作下拉菜单组（额外项）
+          help: 在固定菜单项（复制 Markdown、点赞、分享）之外添加分组；分组内可添加预设项或自定义项
+          sortable: true
+          addLabel: 添加下拉栏组
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: text
+              key: title
+              name: title
+              label: 分组名称
+              value: ""
+            - $formkit: array
+              key: items
+              name: items
+              label: 菜单项
+              sortable: true
+              addLabel: 添加菜单项
+              value: []
+              itemLabels:
+                - type: select
+                  label: $value.type
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+              children:
+                - $formkit: select
+                  key: type
+                  name: type
+                  label: 菜单项类型
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+                  value: chatgpt
+                - $formkit: textarea
+                  if: "$value.type === 'custom'"
+                  key: icon
+                  name: icon
+                  label: 图标 SVG 代码
+                  help: 可粘贴完整 <svg>...</svg>；主题统一控制图标大小，颜色自动适配主题
+                  value: ""
+                - $formkit: text
+                  if: "$value.type === 'custom'"
+                  key: title
+                  name: title
+                  label: 菜单项标题
+                  value: ""
+                - $formkit: url
+                  if: "$value.type === 'custom'"
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""
+        - $formkit: switch
+          key: show_toc
+          name: show_toc
+          label: 显示右侧目录(TOC)
+          value: true
+        - $formkit: text
+          key: doc_footer_text
+          name: doc_footer_text
+          label: 文档页底部说明文字
+          help: 显示在文档正文末尾（如版权、更新时间说明）；留空则不显示
+          value: ""
+
+    # ============ Docsme plugin page settings ============
+    - group: docsme
+      label: Docsme 插件页面
+      formSchema:
+        - $formkit: switch
+          key: plugin_enabled
+          name: plugin_enabled
+          label: 启用 Docsme 插件适配页面
+          help: 关闭后 Docsme 的适配模板不再渲染，前端无法进入该页面
+          value: true
+        - $formkit: text
+          key: archive_title
+          name: archive_title
+          label: 归档页标题
+          help: 文档中心/项目归档页顶部显示的标题
+          value: "文档"
+        - $formkit: textarea
+          key: archive_description
+          name: archive_description
+          label: 归档页描述
+          help: 文档中心/项目归档页顶部显示的描述
+          value: "所有 Docsme 文档项目"
+        - $formkit: switch
+          key: nav_expanded_all
+          name: nav_expanded_all
+          label: 左侧导航默认全部展开
+          value: false
+        - $formkit: switch
+          key: nav_show_count
+          name: nav_show_count
+          label: 左侧导航显示文档数量
+          value: true
+        - $formkit: switch
+          key: toc_enabled
+          name: toc_enabled
+          label: 右侧显示目录（TOC）
+          value: true
+        - $formkit: switch
+          key: toolbar_enabled
+          name: toolbar_enabled
+          label: 内容页顶部显示复制 Markdown 工具栏
+          value: true
+        - $formkit: array
+          key: toolbar_groups
+          name: toolbar_groups
+          label: 操作下拉菜单组（额外项）
+          help: 在固定菜单项（复制 Markdown、点赞、分享）之外添加分组；分组内可添加预设项或自定义项
+          sortable: true
+          addLabel: 添加下拉栏组
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: text
+              key: title
+              name: title
+              label: 分组名称
+              value: ""
+            - $formkit: array
+              key: items
+              name: items
+              label: 菜单项
+              sortable: true
+              addLabel: 添加菜单项
+              value: []
+              itemLabels:
+                - type: select
+                  label: $value.type
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+              children:
+                - $formkit: select
+                  key: type
+                  name: type
+                  label: 菜单项类型
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+                  value: chatgpt
+                - $formkit: textarea
+                  if: "$value.type === 'custom'"
+                  key: icon
+                  name: icon
+                  label: 图标 SVG 代码
+                  help: 可粘贴完整 <svg>...</svg>；主题统一控制图标大小，颜色自动适配主题
+                  value: ""
+                - $formkit: text
+                  if: "$value.type === 'custom'"
+                  key: title
+                  name: title
+                  label: 菜单项标题
+                  value: ""
+                - $formkit: url
+                  if: "$value.type === 'custom'"
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""
+
+    # ============ MiniDocs plugin page settings ============
+    - group: minidocs
+      label: MiniDocs 插件页面
+      formSchema:
+        - $formkit: switch
+          key: plugin_enabled
+          name: plugin_enabled
+          label: 启用 MiniDocs 插件适配页面
+          help: 关闭后 MiniDocs 的适配模板不再渲染，前端无法进入该页面
+          value: true
+        - $formkit: text
+          key: archive_title
+          name: archive_title
+          label: 归档页标题
+          help: 知识库归档页顶部显示的标题
+          value: "知识库"
+        - $formkit: textarea
+          key: archive_description
+          name: archive_description
+          label: 归档页描述
+          help: 知识库归档页顶部显示的描述
+          value: "全部 MiniDocs 知识库"
+        - $formkit: switch
+          key: nav_expanded_all
+          name: nav_expanded_all
+          label: 左侧导航默认全部展开
+          value: false
+        - $formkit: switch
+          key: nav_show_count
+          name: nav_show_count
+          label: 左侧导航显示文档数量
+          value: true
+        - $formkit: switch
+          key: toc_enabled
+          name: toc_enabled
+          label: 右侧显示目录（TOC）
+          value: true
+        - $formkit: switch
+          key: toolbar_enabled
+          name: toolbar_enabled
+          label: 内容页顶部显示复制 Markdown 工具栏
+          value: true
+        - $formkit: array
+          key: toolbar_groups
+          name: toolbar_groups
+          label: 操作下拉菜单组（额外项）
+          help: 在固定菜单项（复制 Markdown、点赞、分享）之外添加分组；分组内可添加预设项或自定义项
+          sortable: true
+          addLabel: 添加下拉栏组
+          value: []
+          itemLabels:
+            - type: text
+              label: $value.title
+          children:
+            - $formkit: text
+              key: title
+              name: title
+              label: 分组名称
+              value: ""
+            - $formkit: array
+              key: items
+              name: items
+              label: 菜单项
+              sortable: true
+              addLabel: 添加菜单项
+              value: []
+              itemLabels:
+                - type: select
+                  label: $value.type
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+              children:
+                - $formkit: select
+                  key: type
+                  name: type
+                  label: 菜单项类型
+                  options:
+                    - label: 在 ChatGPT 中打开
+                      value: chatgpt
+                    - label: 在 Claude 中打开
+                      value: claude
+                    - label: 自定义
+                      value: custom
+                  value: chatgpt
+                - $formkit: textarea
+                  if: "$value.type === 'custom'"
+                  key: icon
+                  name: icon
+                  label: 图标 SVG 代码
+                  help: 可粘贴完整 <svg>...</svg>；主题统一控制图标大小，颜色自动适配主题
+                  value: ""
+                - $formkit: text
+                  if: "$value.type === 'custom'"
+                  key: title
+                  name: title
+                  label: 菜单项标题
+                  value: ""
+                - $formkit: url
+                  if: "$value.type === 'custom'"
+                  key: url
+                  name: url
+                  label: 链接
+                  value: ""

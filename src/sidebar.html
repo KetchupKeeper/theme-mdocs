@@ -1,0 +1,54 @@
+<ul
+  class="doc-nav-list"
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="sidebar(nodes, currentName, currentPostName)"
+  th:attr="data-collapsible=${theme.config.docs?.sidebar_collapsible == false} ? 'false' : 'true'"
+>
+  <li
+    class="doc-nav-item"
+    th:each="node : ${nodes}"
+    th:classappend="${#lists.isEmpty(node.children)} ? '' : ' has-children'"
+  >
+    <div class="doc-nav-row">
+      <a
+        class="doc-nav-link"
+        th:href="@{${node.status.permalink}}"
+        th:text="${node.spec.displayName}"
+        th:classappend="${#strings.equals(node.metadata.name, currentName)} ? ' active'"
+      ></a>
+      <button
+        class="mdocs-nav-toggle"
+        type="button"
+        th:if="${not #lists.isEmpty(node.children) and theme.config.docs?.sidebar_collapsible != false}"
+        aria-label="展开或折叠子分类"
+      >
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="doc-nav-children">
+      <ul
+        class="doc-nav-posts"
+        th:with="catPosts = ${postFinder.listByCategory(1, 999, node.metadata.name)}"
+      >
+        <li
+          class="doc-nav-post"
+          th:each="post : ${catPosts.items}"
+          th:if="${#lists.contains(post.spec.categories, node.metadata.name)}"
+        >
+          <a
+            th:href="@{${post.status.permalink}}"
+            th:text="${post.spec.title}"
+            th:classappend="${#strings.equals(post.metadata.name, currentPostName)} ? ' active'"
+          ></a>
+        </li>
+      </ul>
+
+      <th:block th:if="${not #lists.isEmpty(node.children)}">
+        <th:block th:replace="~{sidebar :: sidebar(${node.children}, ${currentName}, ${currentPostName})}" />
+      </th:block>
+    </div>
+  </li>
+</ul>

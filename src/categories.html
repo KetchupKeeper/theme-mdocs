@@ -1,0 +1,88 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|分类 - ${site.title}|">分类</title>
+  </template>
+
+  <!-- Doc group archive: categories added manually in theme settings -->
+  <div
+    class="mdocs-plugin-list mdocs-docgroup-archive"
+    th:if="${theme.config.docs?.doc_groups != null and not #lists.isEmpty(theme.config.docs?.doc_groups)}"
+  >
+    <div class="mdocs-container-page">
+      <header class="mdocs-plugin-list-head">
+        <h1
+          th:text="${not #strings.isEmpty(theme.config.docs?.archive_title) ? theme.config.docs?.archive_title : '文档'}"
+        >文档</h1>
+        <p
+          th:text="${not #strings.isEmpty(theme.config.docs?.archive_description) ? theme.config.docs?.archive_description : '按分类整理的文档组'}"
+        >按分类整理的文档组</p>
+      </header>
+
+      <div class="mdocs-plugin-card-grid">
+        <th:block
+          th:each="groupName : ${theme.config.docs?.doc_groups}"
+        >
+          <th:block
+            th:with="group = ${categoryFinder.getByName(groupName)}"
+          >
+            <a
+              class="mdocs-plugin-card mdocs-category-card"
+              th:if="${group != null}"
+              th:href="@{${group.status.permalink}}"
+            >
+              <span
+                class="mdocs-plugin-card-banner"
+                th:if="${not #strings.isEmpty(group.spec.cover)}"
+              >
+                <img th:src="${group.spec.cover}" th:alt="${group.spec.displayName}" />
+              </span>
+              <span
+                class="mdocs-plugin-card-banner mdocs-plugin-card-fallback"
+                th:unless="${not #strings.isEmpty(group.spec.cover)}"
+              >
+                <span
+                  th:text="${not #strings.isEmpty(group.spec.displayName) ? #strings.substring(group.spec.displayName, 0, 1) : '文'}"
+                >文</span>
+              </span>
+              <span class="mdocs-plugin-card-body">
+                <span class="mdocs-plugin-card-title" th:text="${group.spec.displayName}"></span>
+                <span
+                  class="mdocs-plugin-card-desc"
+                  th:if="${not #strings.isEmpty(group.spec.description)}"
+                  th:text="${group.spec.description}"
+                ></span>
+                <span class="mdocs-plugin-card-meta">
+                  <span
+                    th:text="|共 ${group.status != null and group.status.postCount != null ? group.status.postCount : 0} 篇文章|"
+                  >共 0 篇文章</span>
+                  <span class="mdocs-plugin-card-link" th:text="${group.status.permalink}"></span>
+                </span>
+                <span class="mdocs-plugin-card-action">访问文档 →</span>
+              </span>
+            </a>
+          </th:block>
+        </th:block>
+      </div>
+    </div>
+  </div>
+
+  <!-- Regular category list -->
+  <div class="mdocs-container-page page-wrap" th:unless="${theme.config.docs?.doc_groups != null and not #lists.isEmpty(theme.config.docs?.doc_groups)}">
+    <h1 class="page-title">分类</h1>
+    <ul class="category-list">
+      <li th:each="cat : ${categories.items}">
+        <a
+          th:href="@{${cat.status.permalink}}"
+          th:text="|${cat.spec.displayName} (${cat.postCount})|"
+          class="category"
+        ></a>
+      </li>
+    </ul>
+
+    <nav class="pagination" th:if="${categories.hasPrevious() || categories.hasNext()}">
+      <a th:if="${categories.hasPrevious()}" th:href="@{${categories.prevUrl}}">上一页</a>
+      <span th:text="|${categories.page} / ${categories.totalPages}|"></span>
+      <a th:if="${categories.hasNext()}" th:href="@{${categories.nextUrl}}">下一页</a>
+    </nav>
+  </div>
+</include>

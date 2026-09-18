@@ -1,0 +1,76 @@
+<include src="layout.html">
+  <template name="head">
+    <title
+      th:text="|${not #strings.isEmpty(singlePage.spec.title) ? singlePage.spec.title : 'Docsme 文档'} - ${site.title}|"
+    >Docsme 文档</title>
+  </template>
+
+  <!-- Docsme: standalone page template (docsme-docs) listing all Docsme projects -->
+  <th:block
+    th:if="${pluginFinder.available('plugin-docsme') and theme.config.docsme?.plugin_enabled != false}"
+  >
+    <th:block th:with="projectResult = ${docsmeProjectsFinder.list(1, 1000)}">
+      <div class="mdocs-plugin-list mdocs-docsme-list">
+        <div class="mdocs-container-page">
+          <header class="mdocs-plugin-list-head">
+            <h1
+              th:text="${not #strings.isEmpty(theme.config.docsme?.archive_title) ? theme.config.docsme?.archive_title : (not #strings.isEmpty(singlePage.spec.title) ? singlePage.spec.title : 'Docsme 文档')}"
+            >Docsme 文档</h1>
+            <p th:text="${not #strings.isEmpty(theme.config.docsme?.archive_description) ? theme.config.docsme?.archive_description : ('共 ' + projectResult.total + ' 个 Docsme 文档项目')}">共 0 个 Docsme 文档项目</p>
+          </header>
+
+          <div
+            class="mdocs-plugin-card-grid"
+            th:if="${projectResult != null and not #lists.isEmpty(projectResult.items)}"
+          >
+            <a
+              class="mdocs-plugin-card mdocs-project-card"
+              th:each="project : ${projectResult.items}"
+              th:href="@{${project.status.permalink}}"
+            >
+              <span
+                class="mdocs-plugin-card-banner"
+                th:if="${not #strings.isEmpty(project.spec.icon)}"
+              >
+                <img
+                  th:src="${project.spec.icon}"
+                  th:alt="${project.spec.displayName}"
+                />
+              </span>
+              <span class="mdocs-plugin-card-body">
+                <span class="mdocs-plugin-card-title" th:text="${project.spec.displayName}"></span>
+                <span class="mdocs-plugin-card-meta">
+                  <span th:text="|共 ${project.status.totalDocs ?: 0} 篇文档|">共 0 篇文档</span>
+                  <span class="mdocs-plugin-card-link" th:text="${project.status.permalink}"></span>
+                </span>
+                <span class="mdocs-plugin-card-action">访问项目 →</span>
+              </span>
+            </a>
+          </div>
+
+          <p
+            class="mdocs-plugin-empty"
+            th:if="${projectResult == null or #lists.isEmpty(projectResult.items)}"
+          >
+            暂无 Docsme 文档项目。
+          </p>
+        </div>
+      </div>
+    </th:block>
+  </th:block>
+
+  <section
+    class="section"
+    th:if="${pluginFinder.available('plugin-docsme') and theme.config.docsme?.plugin_enabled == false}"
+  >
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">Docsme 适配页面已关闭，请在主题设置中开启后再访问。</p>
+    </div>
+  </section>
+
+  <section class="section" th:unless="${pluginFinder.available('plugin-docsme') or theme.config.docsme?.plugin_enabled == false}">
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">Docsme 插件不可用，无法渲染此页面。</p>
+    </div>
+  </section>
+</include>

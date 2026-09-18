@@ -1,0 +1,130 @@
+<th:block
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="minidocsReader(kbSlug, activeDocSlug, viewBaseUrl)"
+>
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="切换目录">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+    <span>目录</span>
+  </button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div
+    class="doc-layout minidocs-doc-layout"
+    th:with="knowledgeBase = ${minidocsFinder.getKnowledgeBase(kbSlug)}, docTree = ${minidocsFinder.getDocTree(kbSlug)}, currentDocSlug = ${not #strings.isEmpty(activeDocSlug) ? activeDocSlug : (docTree == null or #lists.isEmpty(docTree) ? null : docTree[0].slug)}, doc = ${not #strings.isEmpty(currentDocSlug) ? minidocsFinder.getDocBySlug(kbSlug, currentDocSlug) : null}"
+  >
+    <aside class="doc-sidebar">
+      <div class="minidocs-kb-heading" th:if="${knowledgeBase != null}">
+        <span class="minidocs-kb-cover">
+          <img
+            th:if="${not #strings.isEmpty(knowledgeBase.spec.cover)}"
+            th:src="${knowledgeBase.spec.cover}"
+            alt=""
+          />
+          <span
+            class="minidocs-kb-cover-fallback"
+            th:unless="${not #strings.isEmpty(knowledgeBase.spec.cover)}"
+            th:text="${not #strings.isEmpty(knowledgeBase.spec.displayName) ? #strings.substring(knowledgeBase.spec.displayName, 0, 1) : '库'}"
+          >库</span>
+        </span>
+        <div class="minidocs-kb-info">
+          <a
+            class="doc-sidebar-kb-title"
+            th:href="@{${viewBaseUrl}}"
+            th:text="${knowledgeBase.spec.displayName}"
+          ></a>
+          <div class="minidocs-kb-stats">
+            <span
+              th:if="${theme.config.minidocs?.nav_show_count != false}"
+              th:text="|共 ${knowledgeBase.status != null and knowledgeBase.status.docCount != null ? knowledgeBase.status.docCount : 0} 篇|"
+            >共 0 篇</span>
+            <span
+              th:if="${knowledgeBase.spec.updateTime != null}"
+              th:text="|更新于 ${#temporals.format(knowledgeBase.spec.updateTime, 'yyyy年MM月dd日 HH:mm')}|"
+            ></span>
+          </div>
+        </div>
+      </div>
+      <nav class="doc-sidebar-nav">
+        <ul class="doc-nav-list">
+          <th:block th:each="node : ${docTree}">
+            <th:block th:replace="~{:: minidocsNode(node=${node})}" />
+          </th:block>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="doc-content">
+      <article class="doc-article" th:if="${doc != null}">
+        <nav class="doc-breadcrumb">
+          <a th:href="@{${viewBaseUrl}}" th:if="${knowledgeBase != null}" th:text="${knowledgeBase.spec.displayName}"></a>
+        </nav>
+
+        <header class="doc-article-header">
+          <h1 class="doc-article-title" th:text="${doc.spec.title}"></h1>
+        </header>
+
+        <div class="doc-article-meta">
+          <time
+            th:if="${doc.spec.updateTime != null}"
+            th:text="${#temporals.format(doc.spec.updateTime, 'yyyy-MM-dd')}"
+          ></time>
+          <span th:if="${not #strings.isEmpty(doc.spec.author)}" th:text="| · ${doc.spec.author}|"></span>
+        </div>
+
+        <div class="doc-article-body" th:utext="${doc.spec.content}"></div>
+      </article>
+
+      <p class="mdocs-plugin-empty" th:unless="${doc != null}">
+        该知识库暂无已发布文档。
+      </p>
+    </div>
+
+    <aside class="doc-toc">
+      <div class="toc-title">目录</div>
+      <nav class="toc-list" id="toc-list"></nav>
+    </aside>
+  </div>
+
+  <script th:inline="javascript">
+    window.minidocsViewer = {
+      kbSlug: /*[[${kbSlug}]]*/ "",
+      viewBaseUrl: /*[[${viewBaseUrl}]]*/ "",
+    };
+  </script>
+
+  <!-- MiniDocs document tree (recursive fragment) -->
+  <th:block th:fragment="minidocsNode(node)">
+    <li
+      class="doc-nav-item"
+      th:classappend="${node.children != null and not #lists.isEmpty(node.children)} ? ' has-children'"
+    >
+      <div class="doc-nav-row">
+        <a
+          class="doc-nav-link"
+          th:href="@{${viewBaseUrl} + '?docSlug=' + node.slug}"
+          th:classappend="${node.slug == currentDocSlug} ? ' active'"
+          th:text="${node.title}"
+        ></a>
+        <button
+          class="mdocs-nav-toggle"
+          type="button"
+          aria-label="折叠/展开"
+          th:if="${node.children != null and not #lists.isEmpty(node.children)}"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <ul class="doc-nav-list doc-nav-children" th:if="${node.children != null and not #lists.isEmpty(node.children)}">
+        <th:block th:each="child : ${node.children}">
+          <th:block th:replace="~{:: minidocsNode(node=${child})}" />
+        </th:block>
+      </ul>
+    </li>
+  </th:block>
+</th:block>

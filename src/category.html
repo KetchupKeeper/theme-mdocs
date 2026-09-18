@@ -1,0 +1,227 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${category.spec.displayName} - ${site.title}|">分类</title>
+  </template>
+
+  <th:block
+    th:with="breadcrumbs = ${categoryFinder.getBreadcrumbs(category.metadata.name)},
+             docGroup = ${#lists.isEmpty(breadcrumbs) ? null : breadcrumbs[0]},
+             docEnabled = ${not #lists.isEmpty(theme.config.docs?.doc_groups) and docGroup != null and #lists.contains(theme.config.docs?.doc_groups, docGroup.metadata.name)}"
+  >
+  <th:block th:if="${docEnabled}">
+
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="切换目录">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+    <span>目录</span>
+  </button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div
+    class="doc-layout"
+    th:with="breadcrumbs = ${categoryFinder.getBreadcrumbs(category.metadata.name)}, docGroup = ${#lists.isEmpty(breadcrumbs) ? null : breadcrumbs[0]}"
+    th:attr="data-current-group=${docGroup != null ? docGroup.metadata.name : ''}, data-default-expanded=${theme.config.docs?.sidebar_default_expanded}"
+  >
+    <aside class="doc-sidebar">
+      <div
+        class="doc-sidebar-header"
+        th:if="${not (theme.config.docs?.doc_groups != null and not #lists.isEmpty(theme.config.docs?.doc_groups) and docGroup != null and #lists.contains(theme.config.docs?.doc_groups, docGroup.metadata.name)) and theme.config.global?.show_site_name != false}"
+        th:text="${site.title}"
+      ></div>
+
+      <div
+        class="mdocs-docsme-sidebar-controls minidocs-toolbar docgroup-toolbar"
+        th:if="${theme.config.docs?.doc_groups != null and not #lists.isEmpty(theme.config.docs?.doc_groups) and docGroup != null and #lists.contains(theme.config.docs?.doc_groups, docGroup.metadata.name)}"
+      >
+        <button
+          type="button"
+          class="mdocs-docsme-back"
+          onclick="history.back()"
+        >
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>返回</span>
+        </button>
+        <button
+          type="button"
+          class="minidocs-toolbar-btn"
+          onclick="navigator.clipboard?.writeText(window.location.href);this.textContent='已复制'"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span>分享</span>
+        </button>
+      </div>
+
+      <div
+        class="minidocs-kb-heading"
+        th:if="${theme.config.docs?.doc_groups != null and not #lists.isEmpty(theme.config.docs?.doc_groups) and docGroup != null and #lists.contains(theme.config.docs?.doc_groups, docGroup.metadata.name)}"
+      >
+        <span class="minidocs-kb-cover">
+          <img
+            th:if="${not #strings.isEmpty(docGroup.spec.cover)}"
+            th:src="${docGroup.spec.cover}"
+            alt=""
+          />
+          <span
+            class="minidocs-kb-cover-fallback"
+            th:unless="${not #strings.isEmpty(docGroup.spec.cover)}"
+            th:text="${not #strings.isEmpty(docGroup.spec.displayName) ? #strings.substring(docGroup.spec.displayName, 0, 1) : '文'}"
+          >文</span>
+        </span>
+        <div class="minidocs-kb-info">
+          <div class="doc-sidebar-kb-title" th:text="${docGroup.spec.displayName}"></div>
+          <div class="minidocs-kb-stats">
+            <span
+              th:if="${theme.config.docs?.sidebar_show_count != false}"
+              th:text="|共 ${docGroup.status != null and docGroup.status.postCount != null ? docGroup.status.postCount : 0} 篇文章|"
+            >共 0 篇文章</span>
+          </div>
+        </div>
+      </div>
+
+      <nav
+        class="doc-sidebar-nav"
+      >
+        <th:block
+          th:with="docTree = ${categoryFinder.listAsTree(docGroup.metadata.name)},
+                   docChildren = ${#lists.isEmpty(docTree) ? null : docTree[0].children},
+                   rootPosts = ${postFinder.listByCategory(1, 999, docGroup.metadata.name).items}"
+        >
+          <ul class="doc-nav-list">
+            <li
+              class="doc-nav-post"
+              th:each="rootPost : ${rootPosts}"
+              th:if="${#lists.contains(rootPost.spec.categories, docGroup.metadata.name)}"
+            >
+              <a
+                th:href="@{${rootPost.status.permalink}}"
+                th:text="${rootPost.spec.title}"
+              ></a>
+            </li>
+          </ul>
+          <th:block
+            th:replace="~{sidebar :: sidebar(${docChildren}, ${category.metadata.name}, '')}"
+          />
+        </th:block>
+      </nav>
+    </aside>
+
+    <div class="doc-content">
+      <div
+        class="doc-section category-overview"
+        th:with="categoryTree = ${categoryFinder.listAsTree(category.metadata.name)},
+                 categoryNode = ${#lists.isEmpty(categoryTree) ? null : categoryTree[0]},
+                 childNodes = ${categoryNode != null ? categoryNode.children : null},
+                 categoryPosts = ${postFinder.listByCategory(1, 999, category.metadata.name).items}"
+      >
+        <div class="doc-section-header overview-header">
+          <h1 class="doc-section-title" th:text="${category.spec.displayName}"></h1>
+        </div>
+
+        <p class="doc-section-desc overview-desc" th:if="${not #strings.isEmpty(category.spec.description)}" th:text="${category.spec.description}"></p>
+
+        <div class="overview-groups">
+          <!-- Posts directly under the current category -->
+          <section class="card-group overview-group overview-direct" th:if="${not #lists.isEmpty(categoryPosts)}">
+            <div class="overview-group-head">
+              <h2 class="card-group-title overview-group-title">
+                <a th:href="@{${category.status.permalink}}">本分类文章</a>
+              </h2>
+            </div>
+            <ul class="card-grid overview-grid">
+              <li
+                class="card-cell"
+                th:each="post : ${categoryPosts}"
+                th:if="${#lists.contains(post.spec.categories, category.metadata.name)}"
+              >
+                <a class="card-cell-link overview-card-link" th:href="@{${post.status.permalink}}">
+                  <span class="overview-card-title" th:text="${post.spec.title}"></span>
+                  <span
+                    class="overview-card-desc"
+                    th:if="${post.status != null and not #strings.isEmpty(post.status.excerpt)}"
+                    th:text="${post.status.excerpt}"
+                  ></span>
+                </a>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Direct child categories, in Halo category tree order -->
+          <th:block th:if="${not #lists.isEmpty(childNodes)}">
+            <th:block th:each="child : ${childNodes}">
+              <section
+                class="card-group overview-group"
+                th:with="childPosts = ${postFinder.listByCategory(1, 999, child.metadata.name).items}"
+              >
+                <div class="overview-group-head">
+                  <h2 class="card-group-title overview-group-title">
+                    <a th:href="@{${child.status.permalink}}" th:text="${child.spec.displayName}"></a>
+                  </h2>
+                  <span
+                    class="overview-group-count"
+                    th:text="|共 ${#lists.size(childPosts)} 篇|"
+                  >共 0 篇</span>
+                </div>
+
+                <ul class="card-grid overview-grid" th:if="${not #lists.isEmpty(childPosts)}">
+                  <li class="card-cell" th:each="post : ${childPosts}">
+                    <a class="card-cell-link overview-card-link" th:href="@{${post.status.permalink}}">
+                      <span class="overview-card-title" th:text="${post.spec.title}"></span>
+                      <span
+                        class="overview-card-desc"
+                        th:if="${post.status != null and not #strings.isEmpty(post.status.excerpt)}"
+                        th:text="${post.status.excerpt}"
+                      ></span>
+                    </a>
+                  </li>
+                </ul>
+                <p class="overview-empty" th:unless="${not #lists.isEmpty(childPosts)}">该分类下暂无文章</p>
+              </section>
+            </th:block>
+          </th:block>
+
+          <p
+            class="doc-section-empty"
+            th:if="${#lists.isEmpty(categoryPosts) and #lists.isEmpty(childNodes)}"
+          >该分类下暂无文章</p>
+        </div>
+
+        <!-- Data used by the Copy Markdown action -->
+        <script type="application/json" id="page-md-data" th:text="${#strings.concat('#', category.spec.displayName, '\n\n', category.spec.description ?: '', '\n')}"></script>
+      </div>
+    </div>
+  </div>
+  </th:block>
+
+  <!-- Regular category page: category outside any doc group -->
+  <div class="mdocs-container-page page-wrap category-page" th:unless="${docEnabled}">
+    <h1 class="page-title" th:text="${category.spec.displayName}"></h1>
+    <p class="doc-section-desc" th:if="${not #strings.isEmpty(category.spec.description)}" th:text="${category.spec.description}"></p>
+
+    <ul class="post-list category-post-list">
+      <li class="post-item" th:each="item : ${posts.items}">
+        <h2 class="post-title">
+          <a th:href="@{${item.status.permalink}}" th:text="${item.spec.title}"></a>
+        </h2>
+        <p class="post-meta">
+          <time th:text="${#temporals.format(item.spec.publishTime, 'yyyy-MM-dd')}"></time>
+        </p>
+      </li>
+    </ul>
+
+    <nav class="pagination" th:if="${posts.hasPrevious() or posts.hasNext()}">
+      <a th:if="${posts.hasPrevious()}" th:href="@{${posts.prevUrl}}">上一页</a>
+      <span th:text="|${posts.page} / ${posts.totalPages}|"></span>
+      <a th:if="${posts.hasNext()}" th:href="@{${posts.nextUrl}}">下一页</a>
+    </nav>
+  </div>
+  </th:block>
+</include>

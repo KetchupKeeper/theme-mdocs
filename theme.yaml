@@ -1,0 +1,33 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: theme-mdocs
+spec:
+  displayName: 源蝶文档
+  author:
+    name: 源蝶Source开发
+    website: ""
+  description: 面向技术文档、知识库与产品手册场景的 Halo 文档主题，支持分类树导航、多级文档结构与明暗主题
+  logo: "/themes/theme-mdocs/assets/img/logo.avif"
+  homepage: ""
+  repo: ""
+  issues: ""
+  settingName: "theme-mdocs-setting"
+  configMapName: "theme-mdocs-configmap"
+  version: 1.1.0
+  requires: ">=2.25.0"
+  customTemplates:
+    post:
+      - name: "文档"
+        description: "文档型文章：左侧分类导航树 + 右侧目录，适合作为文档组内的正文页。"
+        file: "post_documentation.html"
+    page:
+      - name: "docsme-docs"
+        description: "Docsme 文档中心：展示所有 Docsme 文档项目，可在后台“页面”中新建页面后选择。"
+        file: "docsme-docs.html"
+      - name: "minidocs-docs"
+        description: "MiniDocs 知识库中心：展示当前访问者可见的 MiniDocs 知识库列表。"
+        file: "minidocs-docs.html"
+  license:
+    - name: "MIT"
+      url: "https://opensource.org/license/mit"

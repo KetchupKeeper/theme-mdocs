@@ -1,0 +1,8 @@
+<li class="post-item" th:each="item : ${posts.items}">
+  <h2 class="post-title">
+    <a th:href="@{${item.status.permalink}}" th:text="${item.spec.title}"></a>
+  </h2>
+  <p class="post-meta">
+    <time th:text="${#temporals.format(item.spec.publishTime, 'yyyy-MM-dd')}"></time>
+  </p>
+</li>

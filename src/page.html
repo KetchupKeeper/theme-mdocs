@@ -1,0 +1,14 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${singlePage.spec.title} - ${site.title}|">页面</title>
+  </template>
+
+  <div class="mdocs-container-page">
+    <article class="article">
+      <header class="article-header">
+        <h1 class="article-title" th:text="${singlePage.spec.title}"></h1>
+      </header>
+      <div class="article-content" th:utext="${singlePage.content.content}"></div>
+    </article>
+  </div>
+</include>

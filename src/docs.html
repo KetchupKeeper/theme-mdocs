@@ -1,0 +1,102 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|文档中心 - ${site.title}|">文档中心</title>
+  </template>
+
+  <!-- Docsme: /docs project list page -->
+  <th:block
+    th:if="${pluginFinder.available('plugin-docsme') and projects != null and theme.config.docsme?.plugin_enabled != false}"
+  >
+    <div class="mdocs-plugin-list mdocs-docsme-list">
+      <div class="mdocs-container-page">
+        <header class="mdocs-plugin-list-head">
+          <h1 th:text="${not #strings.isEmpty(theme.config.docsme?.archive_title) ? theme.config.docsme?.archive_title : '文档'}">文档</h1>
+          <p th:text="${not #strings.isEmpty(theme.config.docsme?.archive_description) ? theme.config.docsme?.archive_description : '所有 Docsme 文档项目'}">所有 Docsme 文档项目</p>
+        </header>
+
+        <div
+          class="mdocs-plugin-card-grid"
+          th:if="${not #lists.isEmpty(projects)}"
+        >
+          <a
+            class="mdocs-plugin-card mdocs-project-card"
+            th:each="project : ${projects}"
+            th:href="${project.status.permalink}"
+          >
+            <span
+              class="mdocs-plugin-card-banner"
+              th:if="${not #strings.isEmpty(project.spec.icon)}"
+            >
+              <img th:src="${project.spec.icon}" th:alt="${project.spec.displayName}" />
+            </span>
+            <span class="mdocs-plugin-card-body">
+              <span class="mdocs-plugin-card-title" th:text="${project.spec.displayName}"></span>
+              <span class="mdocs-plugin-card-meta">
+                <span th:text="|共 ${project.status.totalDocs ?: 0} 篇文档|">共 0 篇文档</span>
+                <span class="mdocs-plugin-card-link" th:text="${project.status.permalink}"></span>
+              </span>
+              <span class="mdocs-plugin-card-action">访问项目 →</span>
+            </span>
+          </a>
+        </div>
+
+        <p class="mdocs-plugin-empty" th:if="${#lists.isEmpty(projects)}">
+          暂无 Docsme 文档项目。
+        </p>
+      </div>
+    </div>
+  </th:block>
+
+  <section class="section" th:if="${projects != null and theme.config.docsme?.plugin_enabled == false}">
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">Docsme 适配页面已关闭，请在主题设置中开启后再访问。</p>
+    </div>
+  </section>
+
+  <!-- MiniDocs: /docs knowledge base list page -->
+  <th:block th:if="${pluginFinder.available('halo-plugin-minidocs') and projects == null}">
+    <div class="mdocs-plugin-list mdocs-minidocs-list">
+      <div class="mdocs-container-page" th:with="kbResult = ${minidocsFinder.listKnowledgeBases(1, 1000)}">
+        <header class="mdocs-plugin-list-head">
+          <h1>知识库</h1>
+          <p>全部 MiniDocs 知识库</p>
+        </header>
+
+        <div class="mdocs-plugin-card-grid">
+          <a
+            class="mdocs-plugin-card mdocs-kb-card"
+            th:each="kb : ${kbResult.items}"
+            th:href="@{'/docs/view/' + ${not #strings.isEmpty(kb.spec.slug) ? kb.spec.slug : kb.metadata.name}}"
+          >
+            <span class="mdocs-plugin-card-banner" th:if="${not #strings.isEmpty(kb.spec.cover)}">
+              <img th:src="${kb.spec.cover}" th:alt="${kb.spec.displayName}" />
+            </span>
+            <span
+              class="mdocs-plugin-card-banner mdocs-plugin-card-fallback"
+              th:unless="${not #strings.isEmpty(kb.spec.cover)}"
+            >
+              <span
+                th:text="${not #strings.isEmpty(kb.spec.displayName) ? #strings.substring(kb.spec.displayName, 0, 1) : '库'}"
+              >库</span>
+            </span>
+            <span class="mdocs-plugin-card-body">
+              <span class="mdocs-plugin-card-title" th:text="${kb.spec.displayName}"></span>
+              <span
+                class="mdocs-plugin-card-desc"
+                th:if="${not #strings.isEmpty(kb.spec.description)}"
+                th:text="${kb.spec.description}"
+              ></span>
+              <span class="mdocs-plugin-card-meta">
+                <span th:text="|共 ${kb.status != null and kb.status.docCount != null ? kb.status.docCount : 0} 篇文档|">共 0 篇文档</span>
+              </span>
+            </span>
+          </a>
+        </div>
+
+        <p class="mdocs-plugin-empty" th:if="${#lists.isEmpty(kbResult.items)}">
+          暂无 MiniDocs 知识库。
+        </p>
+      </div>
+    </div>
+  </th:block>
+</include>

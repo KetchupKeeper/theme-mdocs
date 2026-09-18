@@ -1,0 +1,668 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="${site.title}">源蝶Source开发</title>
+  </template>
+
+      
+  
+
+  <div class="homepage">
+    <div class="homepage-container">
+      <th:block th:with="modules = ${theme.config.homepage?.modules ?: T(java.util.Collections).emptyList()}">
+      <th:block th:each="module : ${modules}">
+
+        <th:block th:if="${module.type == 'hero-carousel'}">
+        <section class="hero">
+          <div class="container hero-inner">
+            <div class="hero-text">
+              <h1 class="hero-title" th:text="${module.hc_title}"></h1>
+              <p class="hero-subtitle" th:text="${module.hc_subtitle}"></p>
+              <div class="hero-actions">
+                <a
+                  class="hero-btn hero-primary"
+                  th:if="${not #strings.isEmpty(module.hc_primary_text)}"
+                  th:classappend="${not #strings.isEmpty(module.hc_primary_color)} ? 'hero-primary-custom'"
+                  th:href="@{${module.hc_primary_url}}"
+                  th:text="${module.hc_primary_text}"
+                  th:style="${not #strings.isEmpty(module.hc_primary_color)} ? 'background:' + module.hc_primary_color : ''"
+                ></a>
+                <a
+                  class="hero-btn hero-secondary"
+                  th:if="${not #strings.isEmpty(module.hc_secondary_text)}"
+                  th:classappend="${not #strings.isEmpty(module.hc_secondary_color)} ? 'hero-secondary-custom'"
+                  th:href="@{${module.hc_secondary_url}}"
+                  th:text="${module.hc_secondary_text}"
+                  th:style="${not #strings.isEmpty(module.hc_secondary_color)} ? 'color:' + module.hc_secondary_color + ';border-color:' + module.hc_secondary_color : ''"
+                ></a>
+              </div>
+              <div class="hero-install" th:if="${not #lists.isEmpty(module.hc_install_options)}">
+                <a class="install-pill" th:each="opt : ${module.hc_install_options ?: T(java.util.Collections).emptyList()}" th:href="@{${opt.url}}">
+                  <span
+                    class="install-pill-icon"
+                    th:if="${not #strings.isEmpty(opt.icon)}"
+                    th:utext="${opt.icon}"
+                  ></span>
+                  <span class="install-pill-label" th:text="${opt.label}"></span>
+                </a>
+              </div>
+            </div>
+            <div
+              class="hero-carousel"
+              th:if="${module.hc_carousel_enabled and (not #strings.isEmpty(module.hc_default_image) or not #lists.isEmpty(module.hc_carousel_images))}"
+              th:attr="data-speed=${module.hc_carousel_speed}"
+            >
+              <div class="hero-carousel-track">
+                <div class="hero-carousel-slide active" th:if="${not #strings.isEmpty(module.hc_default_image)}">
+                  <img th:src="@{${module.hc_default_image}}" alt="" />
+                </div>
+                <a
+                  th:each="img,stat : ${module.hc_carousel_images ?: T(java.util.Collections).emptyList()}"
+                  th:href="@{${not #strings.isEmpty(img.href)} ? ${img.href} : '#'}"
+                  class="hero-carousel-slide"
+                  th:classappend="${#strings.isEmpty(module.hc_default_image) and stat.first} ? 'active'"
+                >
+                  <img th:src="@{${img.src}}" th:alt="${img.alt}" />
+                </a>
+              </div>
+              <div class="hero-carousel-dots" th:if="${module.hc_carousel_show_dots}">
+                <button class="hero-carousel-dot active" th:if="${not #strings.isEmpty(module.hc_default_image)}" type="button" aria-label="切换到第 1 张"></button>
+                <button
+                  class="hero-carousel-dot"
+                  th:each="img,stat : ${module.hc_carousel_images ?: T(java.util.Collections).emptyList()}"
+                  th:classappend="${#strings.isEmpty(module.hc_default_image) and stat.first} ? 'active'"
+                  th:attr="aria-label='切换到第 ' + ${stat.count} + ' 张'"
+                  type="button"
+                ></button>
+              </div>
+            </div>
+            <div class="hero-image" th:unless="${module.hc_carousel_enabled and (not #strings.isEmpty(module.hc_default_image) or not #lists.isEmpty(module.hc_carousel_images))}">
+              <img th:if="${not #strings.isEmpty(module.hc_default_image)}" th:src="@{${module.hc_default_image}}" alt="preview" />
+            </div>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'quick-start'}">
+        <section class="section quick-start">
+          <div class="container">
+            <div class="section-head">
+              <h2 class="section-title" th:text="${module.title}"></h2>
+              <a class="section-more" th:if="${not #strings.isEmpty(module.qs_more_url)}" th:href="@{${module.qs_more_url}}"><span th:text="${module.qs_more_text}"></span> →</a>
+            </div>
+            <th:block th:with="cards = ${module.qs_cards ?: T(java.util.Collections).emptyList()}">
+              <div class="quick-default" th:if="${not #lists.isEmpty(cards)}">
+                <a
+                  class="quick-card quick-default-main"
+                  th:href="@{${cards[0].url}}"
+                >
+                  <span class="quick-card-media" th:if="${not #strings.isEmpty(cards[0].image)}">
+                    <img th:src="@{${cards[0].image}}" alt="" />
+                    <span
+                      class="quick-card-overlay"
+                      th:if="${cards[0].overlay_enabled == true}"
+                      th:style="'background-image:linear-gradient(to top,' + ${#strings.isEmpty(cards[0].overlay_color) ? 'var(--primary-color)' : cards[0].overlay_color} + ',transparent)'"
+                    ></span>
+                  </span>
+                  <span class="quick-card-content" th:classappend="${not #strings.isEmpty(cards[0].image)} ? 'on-media'">
+                    <span class="quick-card-subtitle" th:text="${cards[0].subtitle}"></span>
+                    <h3 class="quick-card-title" th:text="${cards[0].title}"></h3>
+                    <p class="quick-card-desc" th:text="${cards[0].description}"></p>
+                  </span>
+                </a>
+                <div class="quick-default-side" th:if="${#lists.size(cards) > 1}">
+                  <a
+                    class="quick-card"
+                    th:each="card,stat : ${cards}"
+                    th:if="${stat.index > 0}"
+                    th:href="@{${card.url}}"
+                  >
+                    <span class="quick-card-media" th:if="${not #strings.isEmpty(card.image)}">
+                      <img th:src="@{${card.image}}" alt="" />
+                      <span
+                        class="quick-card-overlay"
+                        th:if="${card.overlay_enabled == true}"
+                        th:style="'background-image:linear-gradient(to top,' + ${#strings.isEmpty(card.overlay_color) ? 'var(--primary-color)' : card.overlay_color} + ',transparent)'"
+                      ></span>
+                    </span>
+                    <span class="quick-card-content" th:classappend="${not #strings.isEmpty(card.image)} ? 'on-media'">
+                      <span class="quick-card-subtitle" th:text="${card.subtitle}"></span>
+                      <h3 class="quick-card-title" th:text="${card.title}"></h3>
+                      <p class="quick-card-desc" th:text="${card.description}"></p>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </th:block>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'cards'}">
+        <section class="section cards-section">
+          <div class="container">
+            <div
+              class="section-head"
+              th:if="${not #strings.isEmpty(module.title) or (module.more_enabled != false and not #strings.isEmpty(module.more_url))}"
+            >
+              <h2 class="section-title" th:text="${module.title}"></h2>
+              <a
+                class="section-more"
+                th:if="${module.more_enabled != false and not #strings.isEmpty(module.more_url)}"
+                th:href="@{${module.more_url}}"
+              >
+                <span th:text="${not #strings.isEmpty(module.more_text) ? module.more_text : '查看更多'}">查看更多</span>
+                →
+              </a>
+            </div>
+            <div class="cards-grid cards-type1" th:if="${module.cards_layout == 'type1' or #strings.isEmpty(module.cards_layout)}">
+              <div class="card-item" th:each="item : ${module.cards_items ?: T(java.util.Collections).emptyList()}">
+                <div class="card-item-cover" th:if="${not #strings.isEmpty(item.cover)}">
+                  <img th:src="@{${item.cover}}" alt="" />
+                </div>
+                <div class="card-item-body">
+                  <h3 class="card-item-title" th:text="${item.title}"></h3>
+                  <p class="card-item-desc" th:if="${not (item.show_description == false) and not #strings.isEmpty(item.description)}" th:text="${item.description}"></p>
+                </div>
+              </div>
+            </div>
+            <div class="cards-grid cards-type3" th:if="${module.cards_layout == 'type3'}">
+              <div class="card-item card-item-simple" th:each="item : ${module.cards_items ?: T(java.util.Collections).emptyList()}">
+                <a class="card-item-link" th:href="@{${item.url}}">
+                  <span
+                    class="card-item-icon"
+                    th:if="${not #strings.isEmpty(item.icon)}"
+                    th:utext="${item.icon}"
+                  ></span>
+                  <span class="card-item-content">
+                    <span class="card-item-title" th:text="${item.title}"></span>
+                    <span
+                      class="card-item-desc"
+                      th:if="${not (item.show_description == false) and not #strings.isEmpty(item.description)}"
+                      th:text="${item.description}"
+                    ></span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'plugin-docsme-module' or module.type == 'plugin-minidocs-module'}">
+        <section class="section plugin-doc-section">
+          <div class="container">
+            <div
+              class="section-head"
+              th:if="${not #strings.isEmpty(module.title) or (module.doc_more_enabled != false and not #strings.isEmpty(module.doc_more_url))}"
+            >
+              <h2 class="section-title" th:text="${module.title}"></h2>
+              <a
+                class="section-more"
+                th:if="${module.doc_more_enabled != false and not #strings.isEmpty(module.doc_more_url)}"
+                th:href="@{${module.doc_more_url}}"
+              >
+                <span th:text="${not #strings.isEmpty(module.doc_more_text) ? module.doc_more_text : '查看更多'}">查看更多</span>
+                →
+              </a>
+            </div>
+
+            <!-- Modules 7/8: cards auto-loaded from the plugin archive page -->
+            <th:block
+              th:if="${module.doc_content_source == 'archive' and module.type == 'plugin-docsme-module'}"
+            >
+              <th:block th:if="${pluginFinder.available('plugin-docsme')}">
+                <th:block
+                  th:with="projectResult = ${docsmeProjectsFinder.list(1, 1000)}, projects = ${projectResult != null ? projectResult.items : null}"
+                >
+                  <div
+                    class="mdocs-plugin-card-grid"
+                    th:if="${projects != null and not #lists.isEmpty(projects)}"
+                  >
+                    <a
+                      class="mdocs-plugin-card mdocs-project-card"
+                      th:each="project,stat : ${projects}"
+                      th:if="${stat.index lt 8}"
+                      th:href="@{${project.status.permalink}}"
+                      th:title="${project.spec.displayName}"
+                    >
+                      <span
+                        class="mdocs-plugin-card-banner"
+                        th:if="${not #strings.isEmpty(project.spec.icon)}"
+                      >
+                        <img
+                          th:src="${project.spec.icon}"
+                          th:alt="${project.spec.displayName}"
+                          loading="lazy"
+                        />
+                      </span>
+                      <span
+                        class="mdocs-plugin-card-banner mdocs-plugin-card-fallback"
+                        th:unless="${not #strings.isEmpty(project.spec.icon)}"
+                      >
+                        <span
+                          th:text="${not #strings.isEmpty(project.spec.displayName) ? #strings.substring(project.spec.displayName, 0, 1) : '文'}"
+                        >文</span>
+                      </span>
+                      <span class="mdocs-plugin-card-body">
+                        <span class="mdocs-plugin-card-title" th:text="${project.spec.displayName}"></span>
+                        <span class="mdocs-plugin-card-meta">
+                          <span
+                            th:text="|共 ${project.status != null and project.status.totalDocs != null ? project.status.totalDocs : 0} 篇文档|"
+                          >共 0 篇文档</span>
+                          <span class="mdocs-plugin-card-link" th:text="${project.status.permalink}"></span>
+                        </span>
+                        <span class="mdocs-plugin-card-action">访问项目 →</span>
+                      </span>
+                    </a>
+                  </div>
+                  <p
+                    class="mdocs-plugin-empty"
+                    th:if="${projects == null or #lists.isEmpty(projects)}"
+                  >
+                    暂无 Docsme 文档项目。
+                  </p>
+                </th:block>
+              </th:block>
+              <p
+                class="mdocs-plugin-empty"
+                th:if="${not pluginFinder.available('plugin-docsme')}"
+              >
+                Docsme 插件不可用，无法自动读取归档卡片。
+              </p>
+            </th:block>
+
+            <th:block
+              th:if="${module.doc_content_source == 'archive' and module.type == 'plugin-minidocs-module'}"
+            >
+              <th:block th:if="${pluginFinder.available('halo-plugin-minidocs')}">
+                <th:block
+                  th:with="kbResult = ${minidocsFinder.listKnowledgeBases(1, 1000)},
+                           kbs = ${kbResult != null ? kbResult.items : null},
+                           archiveBase = ${not #strings.isEmpty(module.doc_more_url) ? module.doc_more_url : '/minidocs'}"
+                >
+                  <div
+                    class="mdocs-plugin-card-grid"
+                    th:if="${kbs != null and not #lists.isEmpty(kbs)}"
+                  >
+                    <th:block
+                      th:each="kb,stat : ${kbs}"
+                      th:if="${stat.index lt 8}"
+                    >
+                      <th:block
+                        th:with="kbSlug = ${not #strings.isEmpty(kb.spec.slug) ? kb.spec.slug : kb.metadata.name},
+                                 kbUrl = ${archiveBase + '?kb=' + kbSlug}"
+                      >
+                        <a
+                          class="mdocs-plugin-card mdocs-kb-card"
+                          th:href="@{${kbUrl}}"
+                          th:title="${kb.spec.displayName}"
+                        >
+                          <span
+                            class="mdocs-plugin-card-banner"
+                            th:if="${not #strings.isEmpty(kb.spec.cover)}"
+                          >
+                            <img
+                              th:src="${kb.spec.cover}"
+                              th:alt="${kb.spec.displayName}"
+                              loading="lazy"
+                            />
+                          </span>
+                          <span
+                            class="mdocs-plugin-card-banner mdocs-plugin-card-fallback"
+                            th:unless="${not #strings.isEmpty(kb.spec.cover)}"
+                          >
+                            <span
+                              th:text="${not #strings.isEmpty(kb.spec.displayName) ? #strings.substring(kb.spec.displayName, 0, 1) : '库'}"
+                            >库</span>
+                          </span>
+                          <span class="mdocs-plugin-card-body">
+                            <span class="mdocs-plugin-card-title" th:text="${kb.spec.displayName}"></span>
+                            <span
+                              class="mdocs-plugin-card-desc"
+                              th:if="${not #strings.isEmpty(kb.spec.description)}"
+                              th:text="${kb.spec.description}"
+                            ></span>
+                            <span class="mdocs-plugin-card-meta">
+                              <span
+                                th:text="|共 ${kb.status != null and kb.status.docCount != null ? kb.status.docCount : 0} 篇文档|"
+                              >共 0 篇文档</span>
+                            </span>
+                          </span>
+                        </a>
+                      </th:block>
+                    </th:block>
+                  </div>
+                  <p
+                    class="mdocs-plugin-empty"
+                    th:if="${kbs == null or #lists.isEmpty(kbs)}"
+                  >
+                    暂无 MiniDocs 知识库，或当前访客没有阅读权限。
+                  </p>
+                </th:block>
+              </th:block>
+              <p
+                class="mdocs-plugin-empty"
+                th:if="${not pluginFinder.available('halo-plugin-minidocs')}"
+              >
+                MiniDocs 插件不可用，无法自动读取归档卡片。
+              </p>
+            </th:block>
+
+            <!-- Manually added docs (sub-modules 1/2, kept for legacy data) -->
+            <th:block th:unless="${module.doc_content_source == 'archive'}">
+            <th:block
+              th:if="${module.doc_layout == 'cover' or #strings.isEmpty(module.doc_layout)}"
+            >
+              <ul
+                class="plugin-doc-card-grid plugin-doc-cover-grid"
+                th:if="${not #lists.isEmpty(module.doc_cover_items)}"
+              >
+                <li
+                  class="plugin-doc-cover-card"
+                  th:each="item,stat : ${module.doc_cover_items ?: T(java.util.Collections).emptyList()}"
+                  th:if="${stat.index lt 8}"
+                >
+                  <a
+                    class="plugin-doc-card-link"
+                    th:href="@{${item.url ?: '#'}}"
+                    th:title="${item.title}"
+                  >
+                    <span
+                      class="plugin-doc-cover-media"
+                      th:if="${not #strings.isEmpty(item.cover)}"
+                    >
+                      <img th:src="@{${item.cover}}" alt="" loading="lazy" />
+                    </span>
+                    <span class="plugin-doc-cover-body">
+                      <span class="plugin-doc-card-title" th:text="${item.title}"></span>
+                      <span
+                        class="plugin-doc-card-desc"
+                        th:if="${not #strings.isEmpty(item.description)}"
+                        th:text="${item.description}"
+                      ></span>
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </th:block>
+
+            <th:block th:if="${module.doc_layout == 'tree'}">
+              <ul
+                class="plugin-doc-card-grid plugin-doc-tree-grid"
+                th:if="${not #lists.isEmpty(module.doc_tree_items)}"
+              >
+                <li
+                  class="plugin-doc-tree-card"
+                  th:each="item,stat : ${module.doc_tree_items ?: T(java.util.Collections).emptyList()}"
+                  th:if="${stat.index lt 8}"
+                >
+                  <a
+                    class="plugin-doc-card-title-link"
+                    th:href="@{${item.url ?: '#'}}"
+                    th:title="${item.title}"
+                  >
+                    <span
+                      class="plugin-doc-card-icon"
+                      th:if="${not #strings.isEmpty(item.icon)}"
+                      th:utext="${item.icon}"
+                    ></span>
+                    <span class="plugin-doc-card-title" th:text="${item.title}"></span>
+                  </a>
+                  <ul
+                    class="plugin-doc-tree-list"
+                    th:if="${not #lists.isEmpty(item.doc_children)}"
+                  >
+                    <li
+                      class="plugin-doc-tree-item"
+                      th:each="child,childStat : ${item.doc_children}"
+                      th:if="${childStat.index lt 3}"
+                    >
+                      <a
+                        th:href="@{${child.url ?: '#'}}"
+                        th:text="${child.title}"
+                        th:title="${child.title}"
+                      ></a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </th:block>
+            </th:block>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'ocean-categories'}">
+        <section class="section ocean-section">
+          <div class="container">
+            <th:block th:if="${not #lists.isEmpty(module.ocean_blocks)}">
+              <div
+                class="section-head"
+                th:if="${not #strings.isEmpty(module.title) or (module.more_enabled != false and not #strings.isEmpty(module.more_url))}"
+              >
+                <h2 class="section-title" th:text="${module.title ?: '按产品浏览'}">按产品浏览</h2>
+                <a
+                  class="section-more"
+                  th:if="${module.more_enabled != false and not #strings.isEmpty(module.more_url)}"
+                  th:href="@{${module.more_url}}"
+                >
+                  <span th:text="${not #strings.isEmpty(module.more_text) ? module.more_text : '查看更多'}">查看更多</span>
+                  →
+                </a>
+              </div>
+              <ul
+                class="ocean-category-grid"
+                th:style="'--ocean-cols:' + ${#lists.size(module.ocean_blocks)}"
+              >
+                <th:block th:each="block : ${module.ocean_blocks ?: T(java.util.Collections).emptyList()}">
+                  <th:block th:if="${block != null and not #strings.isEmpty(block.category)}">
+                    <th:block th:with="category = ${categoryFinder.getByName(block.category)}">
+                      <li
+                        class="ocean-category-item"
+                        th:if="${category != null}"
+                        th:style="'--ocean-block-color:' + ${#strings.isEmpty(block.color) ? '#0c7be0' : block.color}"
+                      >
+                        <div class="ocean-category-hover">
+                          <span class="ocean-category-accent"></span>
+                          <a class="ocean-category-card" th:href="@{${category.status.permalink}}">
+                            <img
+                              class="ocean-category-cover"
+                              th:if="${not #strings.isEmpty(category.spec.cover)}"
+                              th:src="${category.spec.cover}"
+                              th:alt="${category.spec.displayName}"
+                            />
+                            <span
+                              class="ocean-category-name"
+                              th:text="${not #strings.isEmpty(block.title) ? block.title : category.spec.displayName}"
+                            ></span>
+                            <span
+                              class="ocean-category-desc"
+                              th:if="${not #strings.isEmpty(category.spec.description)}"
+                              th:text="${category.spec.description}"
+                            ></span>
+                            <span class="ocean-category-stars">
+                              <img
+                                alt="GitHub stars"
+                                th:if="${#annotations.contains(category, 'stars')}"
+                                th:src="${#annotations.get(category, 'stars')}"
+                              />
+                            </span>
+                          </a>
+                        </div>
+                        <div
+                          class="ocean-category-extra"
+                          th:if="${not #strings.isEmpty(block.code)}"
+                          th:utext="${block.code}"
+                        ></div>
+                      </li>
+                    </th:block>
+                  </th:block>
+                </th:block>
+              </ul>
+            </th:block>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'ocean-menu'}">
+        <section class="section ocean-section">
+          <div class="container">
+            <div
+              class="section-head"
+              th:if="${not #strings.isEmpty(module.title) or (module.more_enabled != false and not #strings.isEmpty(module.more_url))}"
+            >
+              <h2 class="section-title" th:text="${module.title ?: '常见主题'}">常见主题</h2>
+              <a
+                class="section-more"
+                th:if="${module.more_enabled != false and not #strings.isEmpty(module.more_url)}"
+                th:href="@{${module.more_url}}"
+              >
+                <span th:text="${not #strings.isEmpty(module.more_text) ? module.more_text : '查看更多'}">查看更多</span>
+                →
+              </a>
+            </div>
+            <th:block
+              th:if="${not #lists.isEmpty(module.ocean_menus)}"
+            >
+              <ul class="ocean-menu-card-grid">
+                <th:block
+                  th:each="menuBlock : ${module.ocean_menus}"
+                >
+                  <th:block
+                    th:with="menu = ${menuBlock != null ? menuFinder.getByName(menuBlock.menu) : null}"
+                  >
+                    <li
+                      class="ocean-menu-card"
+                      th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}"
+                    >
+                      <div class="ocean-menu-card-head">
+                        <h3 class="ocean-menu-card-title" th:text="${menu.spec.displayName}"></h3>
+                      </div>
+                      <ul class="ocean-menu-card-list">
+                        <th:block
+                          th:each="menuItem,itemStat : ${menu.menuItems}"
+                        >
+                          <li
+                            class="ocean-menu-card-child"
+                            th:if="${itemStat.index lt 4}"
+                          >
+                            <span
+                              class="ocean-menu-card-child-icon"
+                              th:if="${#annotations.contains(menuItem, 'icon')}"
+                            >
+                              <img
+                                th:src="${#annotations.get(menuItem, 'icon')}"
+                                th:title="${menuItem.status.displayName}"
+                                th:alt="${menuItem.status.displayName}"
+                              />
+                            </span>
+                            <a
+                              class="ocean-menu-card-child-link"
+                              th:href="@{${menuItem.status.href}}"
+                              th:title="${menuItem.status.displayName}"
+                            >
+                              <span
+                                class="ocean-menu-card-child-text"
+                                th:text="${menuItem.status.displayName}"
+                              ></span>
+                            </a>
+                          </li>
+                        </th:block>
+                      </ul>
+                    </li>
+                  </th:block>
+                </th:block>
+              </ul>
+            </th:block>
+          </div>
+        </section>
+        </th:block>
+
+        <th:block th:if="${module.type == 'ocean-posts'}">
+        <section class="section ocean-section">
+          <div class="container">
+            <th:block
+              th:with="source = ${module.ocean_posts_source ?: 'tag'}, sourceTag = ${module.ocean_posts_tag}, sourceCategory = ${module.ocean_posts_category}"
+            >
+              <th:block
+                th:if="${(source == 'tag' and not #strings.isEmpty(sourceTag)) or (source == 'categories' and not #strings.isEmpty(sourceCategory))}"
+              >
+                <th:block
+                  th:with="posts = ${source == 'tag' ? postFinder.listByTag(1, 6, sourceTag).items : postFinder.listByCategory(1, 6, sourceCategory).items}"
+                >
+                  <div th:if="${not #lists.isEmpty(posts)}">
+                    <div class="section-head">
+                      <h2 class="section-title" th:text="${module.title ?: '推荐阅读'}">推荐阅读</h2>
+                    </div>
+                    <ul class="grid grid-cols-2 gap-4 font-semibold text-gray-900 sm:grid-cols-3 sm:gap-6 xl:grid-cols-3 xl:gap-8">
+                      <li
+                        class="group rounded-xl bg-white p-3 px-5 duration-1000 hover:-translate-y-2 hover:shadow dark:bg-zinc-800"
+                        th:each="post : ${posts}"
+                      >
+                        <div class="flex w-full flex-1 items-center justify-between gap-2 opacity-0 transition duration-1000 group-hover:opacity-100">
+                          <a
+                            class="mr-2 rounded-xl px-2 text-xs font-light tabular-nums hover:text-gray-900"
+                            th:style="'color:'+${#annotations.getOrDefault(post.categories[0], 'color', 'var(--primary-color)')}+';background-color:'+${#annotations.getOrDefault(post.categories[0], 'color', 'var(--primary-color)')}+'30'"
+                            th:if="${#lists.size(post.categories)} gt 0"
+                            th:href="@{${post.categories[0].status.permalink}}"
+                            th:title="${post.categories[0].spec.displayName}"
+                            th:text="${post.categories[0].spec.displayName}"
+                          ></a>
+                          <span
+                            class="truncate text-right text-sm font-normal"
+                            th:if="${#lists.size(post.categories)} gt 0"
+                            th:style="'color:'+${#annotations.getOrDefault(post.categories[0], 'color', 'var(--primary-color)')}"
+                            th:text="${#dates.format(post.spec.publishTime,'yyyy年MM月dd日')}"
+                          ></span>
+                        </div>
+                        <div class="mb-1 mt-2 flex h-[59px] w-full flex-1 items-center">
+                          <h3 class="hover-within text-lg font-medium">
+                            <a
+                              class="ocean-post-title-link hover:text-zinc-500 dark:text-zinc-200"
+                              th:href="@{${post.status.permalink}}"
+                              th:title="${post.spec.title}"
+                            >
+                              <span
+                                class="ocean-post-title-icon"
+                                th:if="${not #strings.isEmpty(module.ocean_posts_icon)}"
+                                th:utext="${module.ocean_posts_icon}"
+                              ></span>
+                              <span class="line-clamp-2" th:text="${post.spec.title}"></span>
+                            </a>
+                          </h3>
+                        </div>
+                        <div class="flex w-full flex-1 items-center justify-between gap-2 opacity-0 transition duration-1000 group-hover:opacity-100">
+                          <p
+                            class="text-sm font-light text-[#929eaf] dark:text-zinc-200"
+                            th:text="${post.status.excerpt}"
+                          ></p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </th:block>
+              </th:block>
+            </th:block>
+          </div>
+        </section>
+        </th:block>
+
+      </th:block>
+      </th:block>
+    </div>
+
+    <section class="section browse" th:if="${theme.config.homepage == null or #lists.isEmpty(theme.config.homepage?.modules)}">
+      <div class="container">
+        <h2 class="section-title">按主题浏览</h2>
+        <div class="browse-grid">
+          <a class="browse-card" th:each="group : ${categoryFinder.listAsTree()}" th:href="@{${group.status.permalink}}">
+            <h3 class="browse-card-title" th:text="${group.spec.displayName}"></h3>
+            <p class="browse-card-desc" th:if="${not #strings.isEmpty(group.spec.description)}" th:text="${group.spec.description}"></p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</include>

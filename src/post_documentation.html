@@ -1,0 +1,75 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|${post.spec.title} - ${site.title}|">文档</title>
+  </template>
+
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="切换目录">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+    <span>目录</span>
+  </button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div
+    class="doc-layout"
+    th:with="currentCat = ${#lists.isEmpty(post.spec.categories) ? '' : post.spec.categories[0]}, breadcrumbs = ${#strings.isEmpty(currentCat) ? null : categoryFinder.getBreadcrumbs(currentCat)}, docGroup = ${breadcrumbs != null && !#lists.isEmpty(breadcrumbs) ? breadcrumbs[0] : null}"
+    th:attr="data-current-group=${docGroup != null ? docGroup.metadata.name : ''}, data-default-expanded=${theme.config.docs?.sidebar_default_expanded}"
+  >
+    <aside class="doc-sidebar">
+      <div
+        class="doc-sidebar-header"
+        th:if="${theme.config.global?.show_site_name != false}"
+        th:text="${site.title}"
+      >源蝶Source开发</div>
+      <nav
+        class="doc-sidebar-nav"
+        th:with="tree = ${docGroup != null ? categoryFinder.listAsTree(docGroup.metadata.name) : categoryFinder.listAsTree()}"
+      >
+        <th:block th:replace="~{sidebar :: sidebar(${tree}, ${currentCat}, ${post.metadata.name})}" />
+      </nav>
+    </aside>
+
+    <div class="doc-content">
+      <article class="doc-article">
+        <header class="doc-article-header">
+          <h1 class="doc-article-title" th:text="${post.spec.title}"></h1>
+          <div class="doc-article-meta">
+            <span th:if="${not #lists.isEmpty(post.categories)}">
+              <a
+                th:each="cat : ${post.categories}"
+                th:href="@{${cat.status.permalink}}"
+                th:text="${cat.spec.displayName}"
+                class="doc-article-cat"
+              ></a>
+            </span>
+          </div>
+        </header>
+
+        <div class="doc-article-body" th:utext="${post.content.content}"></div>
+
+        <nav
+          class="doc-pager"
+          th:with="cursor = ${postFinder.cursorByCategory(post.metadata.name)}"
+        >
+          <a
+            class="doc-pager-prev"
+            th:if="${cursor.hasPrevious()}"
+            th:href="@{${cursor.previous.status.permalink}}"
+            th:text="|← ${cursor.previous.spec.title}|"
+          ></a>
+          <a
+            class="doc-pager-next"
+            th:if="${cursor.hasNext()}"
+            th:href="@{${cursor.next.status.permalink}}"
+            th:text="|${cursor.next.spec.title} →|"
+          ></a>
+        </nav>
+      </article>
+
+      <p class="doc-footer-text" th:if="${not #strings.isEmpty(theme.config.docs?.doc_footer_text)}" th:text="${theme.config.docs?.doc_footer_text}"></p>
+    </div>
+  </div>
+</include>

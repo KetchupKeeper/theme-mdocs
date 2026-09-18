@@ -1,0 +1,16 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|500 - ${site.title}|">500 - 服务器错误</title>
+  </template>
+
+  <div class="mdocs-container-page">
+    <th:block
+      th:with="status = ${error?.status ?: 500},
+               detail = ${not #strings.isEmpty(error?.detail) ? error.detail : '页面暂时无法加载，我们已记录这个问题，请稍后重试。'}"
+    >
+      <th:block
+        th:replace="~{error-page :: errorPage(${status}, '服务出了点问题', ${detail})}"
+      ></th:block>
+    </th:block>
+  </div>
+</include>

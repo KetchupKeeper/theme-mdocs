@@ -1,0 +1,247 @@
+<!doctype html>
+<html
+  lang="zh-CN"
+  xmlns:th="https://www.thymeleaf.org"
+  th:lang="${#locale.toLanguageTag}"
+  class="color-scheme-auto"
+  data-color-scheme="auto"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <slot name="head">
+      <title th:text="${site.title}">源蝶Source开发</title>
+    </slot>
+    <script type="module" src="/js/main.ts"></script>
+  </head>
+  <body
+    th:style="'--radius:' + (${theme.config.global?.border_radius} ?: '12px') + ';--font-size:' + (${theme.config.global?.font_size} ?: '16px')"
+    th:attr="data-bg-light=${theme.config.global?.bg_color_light ?: '#ffffff'},data-bg-dark=${theme.config.global?.bg_color_dark ?: '#0d1117'},data-bg-image=${theme.config.global?.background_image},data-primary=${theme.config.global?.primary_color}"
+    th:with="siteLogo = ${not #strings.isEmpty(theme.config.global?.site_logo) ? theme.config.global?.site_logo : site.logo}, siteLogoDark = ${not #strings.isEmpty(theme.config.global?.site_logo_dark) ? theme.config.global?.site_logo_dark : siteLogo}, showSiteName = ${theme.config.global?.show_site_name != false}"
+  >
+<header class="site-header">
+      <div
+        class="header-inner"
+        th:with="primaryMenu = ${menuFinder.getPrimary()}"
+      >
+        <a class="site-brand" th:href="@{/}">
+          <img
+            th:if="${not #strings.isEmpty(siteLogo)}"
+            th:src="${siteLogo}"
+            th:attr="data-logo-light=${siteLogo},data-logo-dark=${siteLogoDark}"
+            class="brand-logo"
+            alt="logo"
+          />
+          <span class="brand-name" th:if="${showSiteName}" th:text="${site.title}">源蝶Source开发</span>
+        </a>
+
+        <nav class="primary-nav" th:if="${not #lists.isEmpty(theme.config.nav?.doc_nav_buttons)}">
+          <a
+            class="primary-nav-link"
+            th:each="btn : ${theme.config.nav?.doc_nav_buttons ?: T(java.util.Collections).emptyList()}"
+            th:href="@{${btn.url ?: '/'}}"
+            th:text="${btn.title}"
+          ></a>
+        </nav>
+
+        <div
+          class="header-right"
+        >
+          <button
+            class="search-trigger"
+            id="search-trigger"
+            type="button"
+            th:if="${pluginFinder.available('PluginSearchWidget')}"
+            onclick="SearchWidget.open()"
+            aria-label="搜索"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="search-trigger-text">搜索</span>
+            <!-- 默认按 Windows/Linux 显示，macOS 下由 initSearchShortcut 改写为 ⌘K -->
+            <kbd class="search-trigger-kbd">Ctrl+K</kbd>
+          </button>
+
+          <button
+            class="mobile-menu-toggle"
+            id="mobile-menu-toggle"
+            type="button"
+            th:if="${primaryMenu != null && not #lists.isEmpty(primaryMenu.menuItems)}"
+            aria-label="打开菜单"
+            aria-controls="header-menu-panel"
+            aria-expanded="false"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div
+            class="header-menu-wrap"
+            id="header-menu-panel"
+            th:if="${primaryMenu != null && not #lists.isEmpty(primaryMenu.menuItems)}"
+          >
+            <th:block th:replace="~{header-menu :: menu}" />
+          </div>
+
+          <div
+            class="header-divider"
+            aria-hidden="true"
+            th:if="${primaryMenu != null && not #lists.isEmpty(primaryMenu.menuItems)}"
+          ></div>
+
+          <div class="header-actions">
+            <th:block
+              th:if="${not #lists.isEmpty(theme.config.nav?.user_buttons)}"
+              th:each="btn : ${theme.config.nav?.user_buttons ?: T(java.util.Collections).emptyList()}"
+            >
+              <a
+                class="header-action-btn header-icon-btn header-action-icon-btn"
+                th:if="${not #strings.isEmpty(btn.svg)}"
+                th:href="@{${btn.url ?: '#'}}"
+                th:title="${btn.label}"
+                th:style="${not #strings.isEmpty(btn.color)} ? '--icon-color:' + btn.color : ''"
+              >
+                <span class="header-action-icon" th:utext="${btn.svg}"></span>
+              </a>
+            </th:block>
+
+            <button
+              class="theme-toggle header-icon-btn"
+              id="theme-toggle"
+              aria-label="切换明暗主题"
+            >
+              <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+
+            <th:block th:replace="~{user-menu :: user-menu}" />
+          </div>
+        </div>
+        <div
+          class="mobile-menu-backdrop"
+          id="mobile-menu-backdrop"
+          th:if="${primaryMenu != null && not #lists.isEmpty(primaryMenu.menuItems)}"
+        ></div>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <slot />
+    </main>
+
+    <footer
+      class="site-footer"
+      th:with="separateFooterLogo = ${theme.config.footer?.footer_separate_logo == true}, footerLogo = ${separateFooterLogo ? (not #strings.isEmpty(theme.config.footer?.footer_logo) ? theme.config.footer?.footer_logo : siteLogo) : siteLogo}, footerLogoDark = ${separateFooterLogo ? (not #strings.isEmpty(theme.config.footer?.footer_logo_dark) ? theme.config.footer?.footer_logo_dark : (not #strings.isEmpty(theme.config.footer?.footer_logo) ? theme.config.footer?.footer_logo : siteLogoDark)) : siteLogoDark}, showFooterName = ${theme.config.footer?.show_footer_name != false}"
+    >
+      <div class="footer-container">
+        <th:block
+          th:if="${not #lists.isEmpty(theme.config.footer?.footer_menus)}"
+        >
+          <div class="footer-menu-columns">
+            <th:block
+              th:each="menuName : ${theme.config.footer?.footer_menus}"
+            >
+              <th:block
+                th:with="footerMenu = ${not #strings.isEmpty(menuName) ? menuFinder.getByName(menuName) : null}"
+              >
+                <div
+                  class="footer-menu-col"
+                  th:if="${footerMenu != null and not #lists.isEmpty(footerMenu.menuItems)}"
+                >
+                  <h4 th:text="${footerMenu.spec.displayName}"></h4>
+                  <ul>
+                    <li th:each="menuItem : ${footerMenu.menuItems}">
+                      <a
+                        th:href="@{${menuItem.status.href}}"
+                        th:text="${menuItem.status.displayName}"
+                        th:target="${menuItem.spec.target?.value}"
+                        th:rel="${menuItem.spec.target?.value == '_blank'} ? 'noopener' : null"
+                      ></a>
+                    </li>
+                  </ul>
+                </div>
+              </th:block>
+            </th:block>
+          </div>
+        </th:block>
+
+        <div class="footer-bottom">
+          <a
+            class="footer-bottom-brand"
+            th:href="@{/}"
+            th:if="${not #strings.isEmpty(footerLogo) or showFooterName}"
+          >
+            <img
+              th:if="${not #strings.isEmpty(footerLogo)}"
+              th:src="${footerLogo}"
+              th:attr="data-logo-light=${footerLogo},data-logo-dark=${footerLogoDark}"
+              class="footer-bottom-logo"
+              alt="logo"
+            />
+            <span
+              class="footer-bottom-name"
+              th:if="${showFooterName}"
+              th:text="${site.title}"
+            ></span>
+          </a>
+          <span
+            class="footer-copyright"
+            th:if="${not #strings.isEmpty(theme.config.footer?.copyright)}"
+            th:text="${theme.config.footer?.copyright}"
+          ></span>
+          <span
+            class="footer-beian"
+            th:if="${not #strings.isEmpty(theme.config.footer?.icp) or not #strings.isEmpty(theme.config.footer?.gongan)}"
+          >
+            <a
+              th:if="${not #strings.isEmpty(theme.config.footer?.icp)}"
+              th:href="${theme.config.footer?.icp_link ?: 'https://beian.miit.gov.cn/'}"
+              target="_blank"
+              rel="noopener"
+              th:text="${theme.config.footer?.icp}"
+            ></a>
+            <a
+              class="footer-gongan"
+              th:if="${not #strings.isEmpty(theme.config.footer?.gongan)}"
+              th:href="${theme.config.footer?.gongan_link ?: 'https://beian.mps.gov.cn/#/query/webSearch'}"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                th:src="@{/themes/theme-mdocs/assets/img/gongan.svg}"
+                class="footer-gongan-icon"
+                alt=""
+              />
+              <span th:text="${theme.config.footer?.gongan}"></span>
+            </a>
+          </span>
+        </div>
+      </div>
+      <halo:footer />
+    </footer>
+    <script th:inline="javascript">
+      window.themePluginPage = {
+        docs: /*[[${theme.config.docs}]]*/ {},
+        docsme: /*[[${theme.config.docsme}]]*/ {},
+        minidocs: /*[[${theme.config.minidocs}]]*/ {},
+      };
+    </script>
+  </body>
+</html>

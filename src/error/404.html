@@ -1,0 +1,16 @@
+<include src="layout.html">
+  <template name="head">
+    <title th:text="|404 - ${site.title}|">404 - 页面不存在</title>
+  </template>
+
+  <div class="mdocs-container-page">
+    <th:block
+      th:with="status = ${error?.status ?: 404},
+               detail = ${not #strings.isEmpty(error?.detail) ? error.detail : '你访问的地址可能已被移动、重命名，或者从未存在过。'}"
+    >
+      <th:block
+        th:replace="~{error-page :: errorPage(${status}, '页面走丢了', ${detail})}"
+      ></th:block>
+    </th:block>
+  </div>
+</include>

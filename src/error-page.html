@@ -1,0 +1,52 @@
+<!-- Shared error page fragment.
+     Referenced by every template under templates/error/ so the pages stay in sync:
+       404.html, 500.html, 4xx.html, 5xx.html and the error.html fallback.
+     Parameters:
+       code   - HTTP status code (number)
+       title  - short, human readable headline
+       detail - one sentence explaining what the visitor can do next -->
+<section
+  class="error-page"
+  xmlns:th="https://www.thymeleaf.org"
+  th:fragment="errorPage(code, title, detail)"
+>
+  <p class="error-code" th:text="${code}">404</p>
+  <h1 class="error-title" th:text="${title}">页面不存在</h1>
+
+  <p
+    class="error-detail"
+    th:if="${not #strings.isEmpty(detail)}"
+    th:text="${detail}"
+  ></p>
+
+  <!-- Server supplied reason, only shown when it adds information -->
+  <p
+    class="error-detail-extra"
+    th:if="${error != null and not #strings.isEmpty(error?.detail) and not #strings.equals(error.detail, detail)}"
+    th:text="${error.detail}"
+  ></p>
+
+  <div class="error-actions">
+    <a class="hero-btn hero-primary" th:href="@{/}">返回首页</a>
+    <button type="button" class="hero-btn hero-secondary" onclick="history.back()">
+      返回上一页
+    </button>
+    <a class="hero-btn hero-secondary" th:href="@{/archives}">浏览归档</a>
+    <button
+      type="button"
+      class="hero-btn hero-secondary"
+      th:if="${pluginFinder != null and pluginFinder.available('PluginSearchWidget')}"
+      onclick="SearchWidget.open()"
+    >
+      搜索文档
+    </button>
+    <button
+      type="button"
+      class="hero-btn hero-secondary"
+      th:if="${code >= 500}"
+      onclick="window.location.reload()"
+    >
+      重新加载
+    </button>
+  </div>
+</section>

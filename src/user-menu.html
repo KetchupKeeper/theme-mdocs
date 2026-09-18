@@ -1,0 +1,41 @@
+<th:block
+  xmlns:th="https://www.thymeleaf.org"
+  xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+  th:fragment="user-menu"
+  th:with="currentUser = ${contributorFinder.getContributor(#authentication.name)}"
+>
+  <div class="user-menu" id="user-menu">
+    <a
+      sec:authorize="isAnonymous()"
+      th:href="@{/login}"
+      class="user-avatar header-icon-btn user-anonymous"
+      title="点击登录"
+    >未登录</a>
+
+    <button
+      sec:authorize="isAuthenticated()"
+      class="user-avatar header-icon-btn user-authenticated"
+      type="button"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <img
+        th:if="${not (currentUser == null) and not #strings.isEmpty(currentUser.avatar)}"
+        th:src="${currentUser.avatar}"
+        class="user-avatar-img"
+        alt="avatar"
+      />
+      <span
+        th:unless="${not (currentUser == null) and not #strings.isEmpty(currentUser.avatar)}"
+        class="user-avatar-text"
+        th:text="${not (currentUser == null)} ? ${currentUser.displayName} : 'U'"
+      >U</span>
+    </button>
+
+    <div class="user-dropdown" sec:authorize="isAuthenticated()">
+      <a th:href="@{/uc}" class="user-dropdown-item">用户中心</a>
+      <a sec:authorize="hasRole('super-role')" th:href="@{/console}" class="user-dropdown-item">控制台</a>
+      <a th:href="@{/logout}" class="user-dropdown-item user-dropdown-logout">退出登录</a>
+    </div>
+  </div>
+</th:block>

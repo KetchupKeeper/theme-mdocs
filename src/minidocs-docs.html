@@ -1,0 +1,95 @@
+<include src="layout.html">
+  <template name="head">
+    <title
+      th:text="|${not #strings.isEmpty(singlePage.spec.title) ? singlePage.spec.title : 'MiniDocs 知识库'} - ${site.title}|"
+    >MiniDocs 知识库</title>
+  </template>
+
+  <!-- MiniDocs: standalone page template (minidocs-docs) keeping the knowledge base archive/list layout -->
+  <th:block
+    th:if="${pluginFinder.available('halo-plugin-minidocs') and theme.config.minidocs?.plugin_enabled != false}"
+  >
+    <th:block
+      th:with="kbResult = ${minidocsFinder.listKnowledgeBases(1, 1000)},
+               archiveBase = ${not #strings.isEmpty(singlePage.status?.permalink) ? singlePage.status.permalink : '/minidocs'}"
+    >
+      <div class="mdocs-plugin-list mdocs-minidocs-list" id="minidocs-archive">
+        <div class="mdocs-container-page">
+          <header class="mdocs-plugin-list-head">
+            <h1
+              th:text="${not #strings.isEmpty(theme.config.minidocs?.archive_title) ? theme.config.minidocs?.archive_title : (not #strings.isEmpty(singlePage.spec.title) ? singlePage.spec.title : '知识库')}"
+            >MiniDocs 知识库</h1>
+            <p th:text="${not #strings.isEmpty(theme.config.minidocs?.archive_description) ? theme.config.minidocs?.archive_description : ('共 ' + kbResult.total + ' 个知识库')}">共 0 个知识库</p>
+          </header>
+
+          <div class="mdocs-plugin-card-grid">
+            <th:block th:each="kb : ${kbResult.items}">
+              <th:block
+                th:with="kbSlug = ${not #strings.isEmpty(kb.spec.slug) ? kb.spec.slug : kb.metadata.name},
+                         kbUrl = ${archiveBase + '?kb=' + kbSlug}"
+              >
+                <a
+                  class="mdocs-plugin-card mdocs-kb-card"
+                  th:href="@{${kbUrl}}"
+                  th:attr="data-kb=${kbSlug},data-title=${kb.spec.displayName},data-cover=${kb.spec.cover}"
+                >
+                  <span
+                    class="mdocs-plugin-card-banner"
+                    th:if="${not #strings.isEmpty(kb.spec.cover)}"
+                  >
+                    <img th:src="${kb.spec.cover}" th:alt="${kb.spec.displayName}" />
+                  </span>
+                  <span
+                    class="mdocs-plugin-card-banner mdocs-plugin-card-fallback"
+                    th:unless="${not #strings.isEmpty(kb.spec.cover)}"
+                  >
+                    <span
+                      th:text="${not #strings.isEmpty(kb.spec.displayName) ? #strings.substring(kb.spec.displayName, 0, 1) : '库'}"
+                    >库</span>
+                  </span>
+                  <span class="mdocs-plugin-card-body">
+                    <span class="mdocs-plugin-card-title" th:text="${kb.spec.displayName}"></span>
+                    <span
+                      class="mdocs-plugin-card-desc"
+                      th:if="${not #strings.isEmpty(kb.spec.description)}"
+                      th:text="${kb.spec.description}"
+                    ></span>
+                    <span class="mdocs-plugin-card-meta">
+                      <span
+                        th:text="|共 ${kb.status != null and kb.status.docCount != null ? kb.status.docCount : 0} 篇文档|"
+                      >共 0 篇文档</span>
+                    </span>
+                  </span>
+                </a>
+              </th:block>
+            </th:block>
+          </div>
+
+          <p
+            class="mdocs-plugin-empty"
+            th:if="${kbResult == null or #lists.isEmpty(kbResult.items)}"
+          >
+            暂无 MiniDocs 知识库，或当前访客没有阅读权限。
+          </p>
+        </div>
+      </div>
+
+      <div class="minidocs-viewer-host" id="minidocs-viewer-host" hidden></div>
+    </th:block>
+  </th:block>
+
+  <section
+    class="section"
+    th:if="${pluginFinder.available('halo-plugin-minidocs') and theme.config.minidocs?.plugin_enabled == false}"
+  >
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">MiniDocs 适配页面已关闭，请在主题设置中开启后再访问。</p>
+    </div>
+  </section>
+
+  <section class="section" th:unless="${pluginFinder.available('halo-plugin-minidocs') or theme.config.minidocs?.plugin_enabled == false}">
+    <div class="mdocs-container-page">
+      <p class="mdocs-plugin-empty">MiniDocs 插件不可用，无法渲染此页面。</p>
+    </div>
+  </section>
+</include>
